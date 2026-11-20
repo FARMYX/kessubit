@@ -444,7 +444,7 @@ export default function Dashboard() {
       </View>
 
       <Text style={{ color: C.muted, fontSize: typeScale.caption, marginTop: space.lg, textAlign: 'center' }}>
-        KESUUBIT · Bocchi × K-On! · hecho para sonar
+        KESUUBIT · Hecho para sonar
       </Text>
     </Screen>
   );

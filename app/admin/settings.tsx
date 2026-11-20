@@ -369,8 +369,8 @@ export default function AdminSettings() {
         <Card style={{ gap: space.sm }}>
           <SectionTitle icon="library-outline" title="Colecciones" />
           <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
-            Crea temáticas nuevas para crecer más allá de Bocchi y K-On!. Luego asígnalas desde
-            Productos. Una colección con productos no se puede borrar hasta vaciarla.
+            Crea temáticas nuevas para ampliar tu catálogo. Luego asígnalas desde Productos. Una
+            colección con productos no se puede borrar hasta vaciarla.
           </Text>
 
           {collections.map((item) => {
@@ -442,7 +442,7 @@ export default function AdminSettings() {
             label={editingCollection ? 'Nombre de la colección' : 'Nueva colección'}
             value={collectionName}
             onChangeText={setCollectionName}
-            placeholder="Ej. Bocchi, K-On!, Metal, Lo-fi…"
+            placeholder="Ej. Rock, Metal, Lo-fi…"
           />
           <Field
             label="Descripción (opcional)"
@@ -543,7 +543,7 @@ export default function AdminSettings() {
             label={editingFandom ? 'Nombre de la etiqueta' : 'Nueva etiqueta'}
             value={fandomName}
             onChangeText={setFandomName}
-            placeholder="Ej. Bocchi, K-On!, Metal…"
+            placeholder="Ej. Rock, Metal, Jazz…"
           />
           <Field
             label="Etiqueta corta (opcional)"

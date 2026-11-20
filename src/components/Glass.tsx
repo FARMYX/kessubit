@@ -85,7 +85,7 @@ export function useGlassTabs() {
           >
             <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.border, marginBottom: 12 }} />
             <Text style={{ color: C.muted, fontSize: 11, lineHeight: 16 }}>
-              Bocchi × K-On! · Hecho para sonar.
+              Hecho para sonar · Oruro, Bolivia.
             </Text>
           </View>
         </View>

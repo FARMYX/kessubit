@@ -111,8 +111,8 @@ export default function Login() {
               escucha el chime de KESUUBIT.
             </Text>
             <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-              <Pill label="Bocchi the Rock!" color={C.pink} />
-              <Pill label="K-On!" color={C.blue} />
+              <Pill label="Hecho para sonar" color={C.pink} />
+              <Pill label="Guitarras y accesorios" color={C.blue} />
               <Pill label="Oruro, Bolivia" color={C.green} />
             </View>
           </Animated.View>

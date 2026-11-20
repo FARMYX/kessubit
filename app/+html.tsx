@@ -18,7 +18,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#FBF7F9" />
         <meta
           name="description"
-          content="KESUUBIT: instrumentos y accesorios con actitud de banda. Bocchi the Rock! × K-On!"
+          content="KESUUBIT: instrumentos y accesorios con actitud de banda. Hecho para sonar en Oruro, Bolivia."
         />
         <ScrollViewStyleReset />
         {headNodes}

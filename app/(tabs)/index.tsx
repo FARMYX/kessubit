@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { C, CATEGORIES, FANDOM } from '../../src/lib/theme';
+import { C, CATEGORIES } from '../../src/lib/theme';
 import { layout, radius, space, tracking, type as typeScale, weight } from '../../src/lib/design';
 import { useResponsive } from '../../src/lib/responsive';
 import { useProducts } from '../../src/context/ProductsContext';
@@ -217,10 +217,10 @@ export default function Catalog() {
           <View style={{ flex: 1, gap: space.md }}>
             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
               <View style={fandomTag(C.pink)}>
-                <Text style={fandomText(C.pink)}>BOCCHI THE ROCK!</Text>
+                <Text style={fandomText(C.pink)}>HECHO PARA SONAR</Text>
               </View>
               <View style={fandomTag(C.blue)}>
-                <Text style={fandomText(C.blue)}>K-ON!</Text>
+                <Text style={fandomText(C.blue)}>ORURO, BOLIVIA</Text>
               </View>
             </View>
             <Text
@@ -237,7 +237,7 @@ export default function Catalog() {
             </Text>
             <Text style={{ color: C.inkSoft, fontSize: isDesktop ? 15 : 13.5, lineHeight: 21, maxWidth: 460 }}>
               Guitarras, bajos, baterías y accesorios elegidos para quienes viven entre riffs y
-              canciones de anime.
+              escenarios.
             </Text>
             <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', marginTop: 2 }}>
               <Pressable
@@ -289,7 +289,7 @@ export default function Catalog() {
               <View style={[sticker, { top: 66, right: 4, transform: [{ rotate: '5deg' }], backgroundColor: C.yellowSoft }]}>
                 <Ionicons name="sparkles" size={16} color={C.yellowDeep} />
                 <Text style={stickerTitle}>Edición banda</Text>
-                <Text style={stickerSub}>Bocchi × K-On!</Text>
+                <Text style={stickerSub}>Tu banda, tu sonido</Text>
               </View>
               <View style={[sticker, { bottom: 0, left: 28, transform: [{ rotate: '-2deg' }], backgroundColor: C.card }]}>
                 <Ionicons name="bicycle" size={16} color={C.green} />
@@ -676,10 +676,7 @@ export default function Catalog() {
         </View>
       )}
 
-      <View style={{ alignItems: 'center', paddingTop: space.xl, gap: 4 }}>
-        <Text style={{ color: C.muted, fontSize: typeScale.small }}>
-          {FANDOM.bocchi.label} × {FANDOM.kon.label}
-        </Text>
+      <View style={{ alignItems: 'center', paddingTop: space.xl }}>
         <Text style={{ color: C.muted, fontSize: typeScale.caption }}>
           KESUUBIT · Hecho para sonar
         </Text>
