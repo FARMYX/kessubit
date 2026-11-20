@@ -214,6 +214,7 @@ export function Field({
   hint,
   style,
   containerStyle,
+  value,
   ...props
 }: TextInputProps & {
   label?: string;
@@ -232,6 +233,10 @@ export function Field({
       <TextInput
         placeholderTextColor={C.muted}
         {...props}
+        // Un TextInput nunca debe alternar entre controlado y no controlado.
+        // Algunos formularios reciben el valor desde Firestore y pueden
+        // entregarlo undefined durante un render; '' mantiene el control.
+        value={value ?? ''}
         onFocus={(event) => {
           setFocused(true);
           props.onFocus?.(event);

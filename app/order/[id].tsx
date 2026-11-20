@@ -59,7 +59,7 @@ export default function OrderDetail() {
   const [busy, setBusy] = useState<OrderStatus | 'cancel' | 'reorder' | null>(null);
   const [proof, setProof] = useState<PaymentProof | null>(null);
   const [proofBusy, setProofBusy] = useState(false);
-  const [amountInput, setAmountInput] = useState('');
+  const [amountInput, setAmountInput] = useState<string | null>(null);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [receiptOpen, setReceiptOpen] = useState(false);
@@ -208,7 +208,7 @@ export default function OrderDetail() {
   };
 
   const amountValue = () => {
-    const parsed = Number(String(amountInput).replace(',', '.'));
+    const parsed = Number(String(amountInput ?? '').replace(',', '.'));
     if (Number.isFinite(parsed) && parsed > 0) return parsed;
     return Number(order.paymentAmount || order.total);
   };
@@ -478,7 +478,7 @@ export default function OrderDetail() {
                 </Text>
                 <Field
                   label="Monto pagado (Bs)"
-                  value={amountInput || String(order.paymentAmount || order.total || '')}
+                  value={amountInput ?? String(order.paymentAmount || order.total || '')}
                   onChangeText={setAmountInput}
                   keyboardType="numeric"
                   placeholder={String(order.total)}
