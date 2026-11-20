@@ -715,10 +715,9 @@ export default function OrderDetail() {
         animationType="fade"
         onRequestClose={() => setProofFullscreen(false)}
       >
-        <Pressable
-          onPress={() => setProofFullscreen(false)}
-          accessibilityRole="button"
-          accessibilityLabel="Cerrar visor de comprobante"
+        {/* El fondo es un Pressable hermano de la tarjeta, no su padre:
+            en web un <button> no puede contener otros botones. */}
+        <View
           style={{
             flex: 1,
             backgroundColor: C.overlay,
@@ -728,8 +727,21 @@ export default function OrderDetail() {
           }}
         >
           <Pressable
-            onPress={() => {}}
+            onPress={() => setProofFullscreen(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Cerrar visor de comprobante"
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+          <View
+            style={{
+              position: 'relative',
+              zIndex: 1,
               width: '100%',
               maxWidth: 720,
               maxHeight: '88%',
@@ -762,8 +774,8 @@ export default function OrderDetail() {
               {money(declaredAmount)} · {orderCode(order)}
             </Text>
             <Btn title="Cerrar" kind="soft" compact onPress={() => setProofFullscreen(false)} />
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </Screen>
   );

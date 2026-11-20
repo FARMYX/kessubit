@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { C, money, paymentStatusOf } from '../lib/theme';
 import { radius, space, type as typeScale, weight } from '../lib/design';
-import { Btn } from './UI';
 import type { Order } from '../lib/types';
 
 /**
@@ -64,14 +63,28 @@ export function PaymentReminder({ order, compact = false }: { order: Order | nul
             : 'Sube la captura para que la tienda verifique tu pago.'}
         </Text>
       </View>
-      <View style={{ flexShrink: 0 }}>
-        <Btn
-          title={rejected ? 'Reenviar' : 'Subir ahora'}
-          kind="soft"
-          compact
-          icon="cloud-upload-outline"
-          onPress={() => router.push(`/order/${order.id}` as any)}
-        />
+      {/* Botón solo visual: todo el recordatorio ya es un Pressable. En web,
+          anidar dos Pressable genera dos <button> y React lo reporta. */}
+      <View
+        style={{
+          flexShrink: 0,
+          minHeight: 38,
+          paddingHorizontal: space.md,
+          paddingVertical: space.sm,
+          borderRadius: radius.md,
+          backgroundColor: C.pinkSoft,
+          borderWidth: 1,
+          borderColor: C.pinkSoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+          gap: space.sm,
+        }}
+      >
+        <Ionicons name="cloud-upload-outline" size={17} color={C.pink} />
+        <Text style={{ color: C.pink, fontWeight: weight.bold, fontSize: typeScale.bodyLg }}>
+          {rejected ? 'Reenviar' : 'Subir ahora'}
+        </Text>
       </View>
     </Pressable>
   );
