@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { addDoc, collection, deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { db } from '../../src/lib/firebase';
-import { C, CATEGORIES, FANDOM, money } from '../../src/lib/theme';
+import { C, CATEGORIES, money } from '../../src/lib/theme';
 import { radius, space, type as typeScale, weight } from '../../src/lib/design';
 import { pickImage } from '../../src/lib/image';
 import { seedProducts } from '../../src/lib/seed';
@@ -21,6 +21,7 @@ import { haptic } from '../../src/lib/haptics';
 import { playSound } from '../../src/lib/sound';
 import { offerOf } from '../../src/lib/offers';
 import { useCollections } from '../../src/lib/collections';
+import { fandomMeta, useFandoms } from '../../src/lib/fandoms';
 import { Badge, Btn, Card, Chip, Empty, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { ProductImage } from '../../src/components/ProductImage';
@@ -73,6 +74,7 @@ const parseSpecs = (text: string) =>
 export default function AdminProducts() {
   const { products, loading } = useProducts();
   const { collections } = useCollections();
+  const { fandoms } = useFandoms();
   const toast = useToast();
 
   const [form, setForm] = useState<Form | null>(null);
@@ -221,6 +223,7 @@ export default function AdminProducts() {
   };
 
   if (form) {
+    const offerPreview = offerOf({ price: Number(form.price), previousPrice: Number(form.previousPrice) });
     return (
       <Screen>
         <ScreenHeader
@@ -281,15 +284,23 @@ export default function AdminProducts() {
 
             <Text style={subLabel}>Fandom</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-              {Object.keys(FANDOM).map((key) => (
-                <Chip
-                  key={key}
-                  label={FANDOM[key].label}
-                  color={FANDOM[key].color}
-                  on={form.fandom === key}
-                  onPress={() => setForm({ ...form, fandom: key })}
-                />
-              ))}
+              {fandoms
+                .filter((item) => item.active !== false || item.id === form.fandom)
+                .map((item) => {
+                  const meta = fandomMeta([item], item.id);
+                  return (
+                    <Chip
+                      key={item.id}
+                      label={meta.label}
+                      color={meta.color}
+                      on={form.fandom === item.id}
+                      onPress={() => setForm({ ...form, fandom: item.id })}
+                    />
+                  );
+                })}
+              {!fandoms.some((item) => item.id === form.fandom) ? (
+                <Chip label={`${fandomMeta([], form.fandom).label} (actual)`} on disabled onPress={() => {}} />
+              ) : null}
             </View>
 
             <View style={{ flexDirection: 'row', gap: space.md }}>
@@ -309,46 +320,57 @@ export default function AdminProducts() {
               />
             </View>
 
-            <View style={{ flexDirection: 'row', gap: space.md }}>
-              <Field
-                label="Precio anterior (opcional)"
-                keyboardType="numeric"
-                value={form.previousPrice}
-                onChangeText={(value) => setForm({ ...form, previousPrice: value })}
-                containerStyle={{ flex: 1 }}
+            <Text style={[subLabel, { marginTop: space.sm }]}>Bajada de precio</Text>
+            <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
+              Si el precio anterior es mayor, la tarjeta muestra el precio tachado y el descuento.
+            </Text>
+            <Field
+              label="Precio anterior (Bs)"
+              keyboardType="numeric"
+              value={form.previousPrice}
+              onChangeText={(value) => setForm({ ...form, previousPrice: value })}
+              placeholder="Ej. 1450"
+              hint="Déjalo vacío si el producto no está en oferta."
+              containerStyle={{ marginBottom: 0 }}
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                paddingVertical: 8,
+                paddingHorizontal: space.md,
+                borderRadius: radius.sm,
+                backgroundColor: offerPreview.active ? C.pinkWash : C.surfaceAlt,
+                borderWidth: 1,
+                borderColor: offerPreview.active ? '#F3D2E1' : C.border,
+              }}
+            >
+              <Ionicons
+                name={offerPreview.active ? 'pricetag' : 'information-circle-outline'}
+                size={15}
+                color={offerPreview.active ? C.pink : C.muted}
               />
-              <Field
-                label="Avisar stock desde"
-                keyboardType="numeric"
-                value={form.lowStockThreshold}
-                onChangeText={(value) => setForm({ ...form, lowStockThreshold: value })}
-                containerStyle={{ flex: 1 }}
-              />
+              <Text style={{ color: C.inkSoft, fontSize: typeScale.small, flex: 1 }}>
+                {offerPreview.active
+                  ? offerPreview.note
+                  : 'Sin oferta activa: el cliente ve solo el precio actual.'}
+              </Text>
+              {offerPreview.active ? (
+                <Text style={{ color: C.pink, fontWeight: weight.black, fontSize: typeScale.small }}>
+                  {offerPreview.label}
+                </Text>
+              ) : null}
             </View>
 
-            {offerOf({ price: Number(form.price), previousPrice: Number(form.previousPrice) }).active ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
-                  paddingVertical: 8,
-                  paddingHorizontal: space.md,
-                  borderRadius: radius.sm,
-                  backgroundColor: C.pinkWash,
-                  borderWidth: 1,
-                  borderColor: '#F3D2E1',
-                }}
-              >
-                <Ionicons name="pricetag" size={15} color={C.pink} />
-                <Text style={{ color: C.inkSoft, fontSize: typeScale.small, flex: 1 }}>
-                  {offerOf({ price: Number(form.price), previousPrice: Number(form.previousPrice) }).note}
-                </Text>
-                <Text style={{ color: C.pink, fontWeight: weight.black, fontSize: typeScale.small }}>
-                  {offerOf({ price: Number(form.price), previousPrice: Number(form.previousPrice) }).label}
-                </Text>
-              </View>
-            ) : null}
+            <Text style={subLabel}>Avisar stock desde</Text>
+            <Field
+              label="Umbral de últimas unidades (opcional)"
+              keyboardType="numeric"
+              value={form.lowStockThreshold}
+              onChangeText={(value) => setForm({ ...form, lowStockThreshold: value })}
+              containerStyle={{ marginBottom: 0 }}
+            />
 
             {collections.length ? (
               <>

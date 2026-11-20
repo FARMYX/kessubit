@@ -165,6 +165,13 @@ await db.doc('collections/rule-collection-public').set({
   active: true,
   createdAt: new Date(),
 });
+await db.doc('fandoms/rule-fandom-public').set({
+  name: 'Fandom público',
+  short: 'Público',
+  color: '#C93A72',
+  active: true,
+  createdAt: new Date(),
+});
 await db.doc('counters/orders').set({ value: 0 });
 await db.doc('storeConfig/settings').set({
   name: 'KESUUBIT',
@@ -296,6 +303,33 @@ expectStatus(
   'client creates a collection'
 );
 ok('impide que el cliente cree colecciones');
+
+// --- fandoms ---------------------------------------------------------------
+expectStatus(await rest('fandoms/rule-fandom-public'), 200, 'anonymous reads fandoms');
+ok('permite leer etiquetas de fandom sin iniciar sesión');
+
+expectStatus(
+  await rest('fandoms?documentId=rule-fandom-1', {
+    method: 'POST',
+    idToken: client.idToken,
+    body: { fields: { name: s('Metal'), short: s('Metal'), color: s('#7A4FD0'), active: b(true) } },
+  }),
+  403,
+  'client creates a fandom'
+);
+ok('impide que el cliente cree etiquetas de fandom');
+
+expectStatus(
+  await rest('fandoms/rule-fandom-public', {
+    method: 'PATCH',
+    idToken: client.idToken,
+    masks: ['name'],
+    body: { fields: { name: s('Fandom falso') } },
+  }),
+  403,
+  'client renames a fandom'
+);
+ok('impide que el cliente renombre etiquetas de fandom');
 
 // --- order counter ---------------------------------------------------------
 expectStatus(
@@ -802,6 +836,38 @@ expectStatus(
   'admin renames a collection'
 );
 ok('permite al administrador renombrar colecciones');
+
+expectStatus(
+  await rest('fandoms?documentId=rule-fandom-1', {
+    method: 'POST',
+    idToken: adminUser.idToken,
+    body: {
+      fields: {
+        name: s('Metal'),
+        short: s('Metal'),
+        color: s('#7A4FD0'),
+        active: b(true),
+        createdAt: timestamp(),
+        updatedAt: timestamp(),
+      },
+    },
+  }),
+  200,
+  'admin creates a fandom'
+);
+ok('permite al administrador crear etiquetas de fandom');
+
+expectStatus(
+  await rest('fandoms/rule-fandom-1', {
+    method: 'PATCH',
+    idToken: adminUser.idToken,
+    masks: ['name'],
+    body: { fields: { name: s('Metal extremo') } },
+  }),
+  200,
+  'admin renames a fandom'
+);
+ok('permite al administrador renombrar etiquetas de fandom');
 
 // --- profile ---------------------------------------------------------------
 expectStatus(

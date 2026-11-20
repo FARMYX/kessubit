@@ -2,7 +2,8 @@ import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { C, FANDOM } from '../lib/theme';
+import { C } from '../lib/theme';
+import { fandomMeta, useFandoms } from '../lib/fandoms';
 import { radius, shadow, space, type as typeScale, weight } from '../lib/design';
 import { useResponsive } from '../lib/responsive';
 import { Btn, Chip } from './UI';
@@ -46,6 +47,12 @@ export function FilterSheet({
 }: Props) {
   const insets = useSafeAreaInsets();
   const { isDesktop } = useResponsive();
+  const { fandoms, visibleFandoms } = useFandoms();
+  // Un producto antiguo puede seguir filtrándose por una etiqueta hoy oculta o borrada.
+  const currentFandom =
+    fandom !== 'all' && !visibleFandoms.some((item) => item.id === fandom)
+      ? fandomMeta(fandoms, fandom)
+      : null;
 
   return (
     <Modal
@@ -120,15 +127,26 @@ export function FilterSheet({
             <Text style={sectionLabel}>Fandom</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               <Chip label="Todos" on={fandom === 'all'} onPress={() => onFandom('all')} />
-              {Object.keys(FANDOM).map((key) => (
+              {visibleFandoms.map((item) => {
+                const meta = fandomMeta([item], item.id);
+                return (
+                  <Chip
+                    key={item.id}
+                    label={meta.label}
+                    color={meta.color}
+                    on={fandom === item.id}
+                    onPress={() => onFandom(item.id)}
+                  />
+                );
+              })}
+              {currentFandom ? (
                 <Chip
-                  key={key}
-                  label={FANDOM[key].label}
-                  color={FANDOM[key].color}
-                  on={fandom === key}
-                  onPress={() => onFandom(key)}
+                  label={currentFandom.label}
+                  color={currentFandom.color}
+                  on
+                  onPress={() => onFandom(fandom)}
                 />
-              ))}
+              ) : null}
             </View>
 
             <Text style={sectionLabel}>Ordenar por</Text>

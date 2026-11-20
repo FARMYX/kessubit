@@ -62,6 +62,16 @@ export const FANDOM: Record<string, { label: string; short: string; color: strin
   both: { label: 'Bocchi × K-On!', short: 'Crossover', color: C.yellowDeep },
 };
 
+/** Paleta corta para elegir el color de una etiqueta de fandom en Ajustes. */
+export const FANDOM_PALETTE = [
+  { label: 'Rosa', color: C.pink },
+  { label: 'Azul', color: C.blue },
+  { label: 'Morado', color: C.purple },
+  { label: 'Dorado', color: C.yellowDeep },
+  { label: 'Verde', color: C.green },
+  { label: 'Rojo', color: C.red },
+];
+
 export const STATUS_COLOR: Record<string, string> = {
   pendiente: C.yellowDeep,
   preparando: C.blue,

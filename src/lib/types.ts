@@ -1,4 +1,18 @@
-export type Fandom = 'bocchi' | 'kon' | 'both';
+/** Slug de fandom. Puede ser una de las etiquetas clásicas o una creada en Ajustes. */
+export type Fandom = string;
+
+/** Etiqueta de fandom gestionable desde administración. */
+export type FandomTag = {
+  id: string;
+  name: string;
+  short?: string;
+  color?: string;
+  active?: boolean;
+  /** Borrado lógico: también permite quitar las etiquetas originales del fallback. */
+  deleted?: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+};
 
 /** Colección temática gestionable desde administración. */
 export type Collection = {

@@ -41,6 +41,7 @@ import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { ProductImage } from '../../src/components/ProductImage';
 import { OrderTimeline } from '../../src/components/OrderTimeline';
 import { Skeleton } from '../../src/components/Skeleton';
+import { ReceiptSheet } from '../../src/components/ReceiptSheet';
 import type { Order, OrderStatus, PaymentProof } from '../../src/lib/types';
 
 export default function OrderDetail() {
@@ -61,6 +62,7 @@ export default function OrderDetail() {
   const [amountInput, setAmountInput] = useState('');
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const [proofFullscreen, setProofFullscreen] = useState(false);
 
   const loading = !!id && loadedId !== id;
@@ -279,7 +281,6 @@ export default function OrderDetail() {
     <Screen>
       <ScreenHeader
         title={orderCode(order)}
-        eyebrow="Detalle del pedido"
         subtitle={`${formatDateTime(order.createdAt)} · ${order.items.length} producto${order.items.length === 1 ? '' : 's'}`}
         back
         right={
@@ -501,6 +502,15 @@ export default function OrderDetail() {
 
           <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
             <Btn title="Volver a pedir" kind="soft" icon="refresh" onPress={reorder} loading={busy === 'reorder'} />
+            <Btn
+              title="Ver recibo"
+              kind="ghost"
+              icon="receipt-outline"
+              onPress={() => {
+                void playSound('receipt');
+                setReceiptOpen(true);
+              }}
+            />
             {canCancel ? (
               <Btn
                 title="Cancelar pedido"
@@ -777,6 +787,16 @@ export default function OrderDetail() {
           </View>
         </View>
       </Modal>
+
+      {order ? (
+        <ReceiptSheet
+          order={order}
+          visible={receiptOpen}
+          onClose={() => {
+            setReceiptOpen(false);
+          }}
+        />
+      ) : null}
     </Screen>
   );
 }

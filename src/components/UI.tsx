@@ -20,7 +20,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { C, FANDOM, money } from '../lib/theme';
+import { C, money } from '../lib/theme';
+import { fandomMeta, useFandoms } from '../lib/fandoms';
 import { radius, shadow, space, spring, tracking, type as typeScale, weight } from '../lib/design';
 import { useBottomPadding, useResponsive } from '../lib/responsive';
 import { initials } from '../lib/format';
@@ -458,7 +459,8 @@ export function ProductCard({
   collectionLabel?: string;
   collectionColor?: string;
 }) {
-  const fandom = FANDOM[p.fandom] || FANDOM.bocchi;
+  const { fandoms } = useFandoms();
+  const fandom = fandomMeta(fandoms, p.fandom);
   const reduced = useReducedMotion() ?? false;
   const [hovered, setHovered] = useState(false);
   const state = stockState(p.stock, p.lowStockThreshold);

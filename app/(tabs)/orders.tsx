@@ -80,7 +80,6 @@ export default function Orders() {
     <Screen>
       <ScreenHeader
         title="Pedidos"
-        eyebrow={orders.length ? `${orders.length} en total` : undefined}
         subtitle="Sigue el estado de cada compra, desde la confirmación hasta la entrega."
       />
 
@@ -183,7 +182,7 @@ export default function Orders() {
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                   <Text style={{ color: C.pink, fontWeight: weight.bold, fontSize: typeScale.small }}>
-                    Ver detalle
+                    Detalle y recibo
                   </Text>
                   <Ionicons name="chevron-forward" size={15} color={C.pink} />
                 </View>

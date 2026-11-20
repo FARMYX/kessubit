@@ -135,6 +135,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Etiquetas de fandom públicas, gestionadas solo desde administración.
+    match /fandoms/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Contador de números de pedido. Solo la Cloud Function lo incrementa con
     // privilegios de servidor, dentro de la misma transacción del pedido.
     match /counters/{id} {

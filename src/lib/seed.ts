@@ -2,12 +2,27 @@ import { collection, doc, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from './firebase';
 const s = (o: Record<string, string>) => Object.entries(o).map(([k, v]) => ({ k, v }));
 
+type SeedProduct = {
+  id: string;
+  name: string;
+  brand: string;
+  category: string;
+  fandom: string;
+  price: number;
+  previousPrice?: number;
+  stock: number;
+  featured?: boolean;
+  description: string;
+  specs: { k: string; v: string }[];
+  image?: string;
+};
+
 // Precios y stock son de ejemplo: edítalos desde el panel admin.
-export const SEED = [
-  { id: 'strat-mcart', name: 'Guitarra eléctrica estilo Stratocaster negra', brand: 'MC-Art', category: 'Guitarras', fandom: 'bocchi', price: 1200, stock: 6, featured: true,
+export const SEED: SeedProduct[] = [
+  { id: 'strat-mcart', name: 'Guitarra eléctrica estilo Stratocaster negra', brand: 'MC-Art', category: 'Guitarras', fandom: 'bocchi', price: 1200, previousPrice: 1450, stock: 6, featured: true,
     description: 'Guitarra de 3 single coils y puente tremolo, ideal para empezar a tocar como Bocchi.',
     specs: s({ Pastillas: '3 single coil', Controles: 'Volumen + 2 tonos, selector de 5 posiciones', Puente: 'Tremolo', Acabado: 'Negro brillante, golpeador blanco' }), image: 'strat-mcart' },
-  { id: 'lp-cherry', name: 'Guitarra estilo Les Paul Cherry Sunburst', brand: 'Genérica', category: 'Guitarras', fandom: 'bocchi', price: 1800, stock: 3,
+  { id: 'lp-cherry', name: 'Guitarra estilo Les Paul Cherry Sunburst', brand: 'Genérica', category: 'Guitarras', fandom: 'bocchi', price: 1800, previousPrice: 2150, stock: 3,
     description: 'Cuerpo con tapa flameada en degradado cereza y dos humbuckers.',
     specs: s({ Pastillas: '2 humbucker', Controles: '2 volumen + 2 tono', Acabado: 'Cherry sunburst' }), image: 'lp-cherry' },
   { id: 'lp-custom', name: 'Gibson Les Paul Custom negra', brand: 'Gibson', category: 'Guitarras', fandom: 'both', price: 12500, stock: 1, featured: true,
@@ -16,19 +31,19 @@ export const SEED = [
   { id: 'bajo-negro', name: 'Bajo eléctrico 4 cuerdas negro', brand: 'Genérica', category: 'Bajos', fandom: 'bocchi', price: 1500, stock: 4,
     description: 'Bajo de 4 cuerdas con dos pastillas, cómodo para principiantes.',
     specs: s({ Cuerdas: '4', Pastillas: '2', Acabado: 'Negro brillante' }), image: 'bajo-negro' },
-  { id: 'bateria', name: 'Batería compacta Yamaha amarilla', brand: 'Yamaha', category: 'Baterías', fandom: 'kon', price: 5200, stock: 2, featured: true,
+  { id: 'bateria', name: 'Batería compacta Yamaha amarilla', brand: 'Yamaha', category: 'Baterías', fandom: 'kon', price: 5200, previousPrice: 5900, stock: 2, featured: true,
     description: 'Kit compacto y portátil, perfecto para ensayos en espacios pequeños (¡Ritsu aprobaría!).',
     specs: s({ Formato: 'Compacto', Acabado: 'Amarillo', Incluye: 'Hardware y platillos' }), image: 'bateria' },
   { id: 'baquetas', name: 'Baquetas Vic Firth American Classic Extreme', brand: 'Vic Firth', category: 'Accesorios', fandom: 'kon', price: 95, stock: 30,
     description: 'Baquetas de madera con punta de madera.',
     specs: s({ Material: 'Hickory', Punta: 'Madera' }), image: 'baquetas' },
-  { id: 'kon-88', name: 'ESI K.ON controlador MIDI 88 teclas', brand: 'ESI', category: 'Teclados', fandom: 'kon', price: 3900, stock: 2,
+  { id: 'kon-88', name: 'ESI K.ON controlador MIDI 88 teclas', brand: 'ESI', category: 'Teclados', fandom: 'kon', price: 3900, previousPrice: 4400, stock: 2,
     description: 'Controlador MIDI de 88 teclas con faders, perillas y pads. El nombre ya lo dice todo.',
     specs: s({ Teclas: '88', Controles: 'Faders, perillas y pads', Conexión: 'MIDI / USB' }), image: 'kon-88' },
-  { id: 'keytar', name: 'Keytar Korg blanco', brand: 'Korg', category: 'Teclados', fandom: 'kon', price: 2100, stock: 2,
+  { id: 'keytar', name: 'Keytar Korg blanco', brand: 'Korg', category: 'Teclados', fandom: 'kon', price: 2100, previousPrice: 2450, stock: 2,
     description: 'Teclado de hombro para tocar de pie y moverte por el escenario.',
     specs: s({ Tipo: 'Keytar', Color: 'Blanco' }), image: 'keytar' },
-  { id: 'amp-ermik', name: 'Amplificador Ermik AGL-20 para guitarra', brand: 'Ermik', category: 'Amplificadores', fandom: 'bocchi', price: 450, stock: 8,
+  { id: 'amp-ermik', name: 'Amplificador Ermik AGL-20 para guitarra', brand: 'Ermik', category: 'Amplificadores', fandom: 'bocchi', price: 450, previousPrice: 560, stock: 8,
     description: 'Combo de práctica con overdrive, salida de audífonos y entrada auxiliar. Incluye cable.',
     specs: s({ Potencia: '20 W', Controles: 'Gain, Bass, Treble, Volume', Extras: 'Overdrive, Phones, Aux in' }), image: 'amp-ermik' },
   { id: 'amp-bajo', name: 'Amplificador para bajo Fender Rumble', brand: 'Fender', category: 'Amplificadores', fandom: 'bocchi', price: 2400, stock: 3,
@@ -38,7 +53,7 @@ export const SEED = [
     description: 'Juego de 6 cuerdas para guitarra eléctrica.', specs: s({ Calibre: '.010–.046', Tipo: 'Custom Light' }), image: 'cuerdas-guitarra' },
   { id: 'cuerdas-bajo', name: 'Cuerdas bajo eléctrico níquel', brand: 'Generic', category: 'Accesorios', fandom: 'bocchi', price: 80, stock: 25,
     description: 'Juego de 4 cuerdas para bajo.', specs: s({ Calibre: '.040 .060 .075 .095', Material: 'Acero niquelado', Núcleo: 'Roundcore taperwound' }), image: 'cuerdas-bajo' },
-  { id: 'pack-puas-bocchi', name: 'Pack 5 púas Bocchi + latita + 50 stickers', brand: 'Merch', category: 'Accesorios', fandom: 'bocchi', price: 70, stock: 20, featured: true,
+  { id: 'pack-puas-bocchi', name: 'Pack 5 púas Bocchi + latita + 50 stickers', brand: 'Merch', category: 'Accesorios', fandom: 'bocchi', price: 70, previousPrice: 95, stock: 20, featured: true,
     description: 'Cinco púas nacaradas con Bocchi, latita metálica y 50 stickers de regalo.', specs: s({ Púas: '5', Extras: 'Latita + 50 stickers' }), image: 'pack-puas-bocchi' },
   { id: 'pua-btr', name: 'Púa negra y dorada BTR!', brand: 'Merch', category: 'Accesorios', fandom: 'bocchi', price: 15, stock: 50,
     description: 'Púa triangular negra con ilustración dorada.', specs: s({ Forma: 'Triangular redondeada', Diseño: 'Dorado sobre negro' }), image: 'pua-btr' },
@@ -85,6 +100,33 @@ export async function seedProducts() {
   const b = writeBatch(db);
   let n = 0;
   [...SEED, ...EXTRA].forEach(({ id, ...rest }) => { if (!existing.has(id)) { b.set(doc(db, 'products', id), rest); n++; } });
+  if (n) await b.commit();
+  return n;
+}
+
+/** Bajadas de precio del catálogo demo; se reutilizan en Ajustes. */
+export const SEED_OFFERS = SEED.flatMap(({ id, previousPrice }) =>
+  typeof previousPrice === 'number' ? [{ id, previousPrice }] : []
+);
+
+/**
+ * Aplica las ofertas de ejemplo a los productos que ya existen en Firestore.
+ * No toca productos con `previousPrice` propio ni los que cambiaron de precio.
+ */
+export async function seedOfferPrices() {
+  const snapshot = await getDocs(collection(db, 'products'));
+  const b = writeBatch(db);
+  let n = 0;
+  snapshot.docs.forEach((document) => {
+    const offer = SEED_OFFERS.find((item) => item.id === document.id);
+    if (!offer) return;
+    const data = document.data();
+    const price = Number(data.price);
+    if (data.previousPrice != null) return;
+    if (!(price > 0) || !(offer.previousPrice > price)) return;
+    b.update(doc(db, 'products', document.id), { previousPrice: offer.previousPrice });
+    n++;
+  });
   if (n) await b.commit();
   return n;
 }

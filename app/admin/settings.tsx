@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { C, money } from '../../src/lib/theme';
+import { C, FANDOM_PALETTE, money } from '../../src/lib/theme';
 import { radius, space, type as typeScale, weight } from '../../src/lib/design';
 import { useStoreConfig } from '../../src/context/StoreConfigContext';
 import { useToast } from '../../src/context/ToastContext';
@@ -10,6 +11,7 @@ import { useNotifications } from '../../src/context/NotificationsContext';
 import { notify } from '../../src/lib/notify';
 import { playSound } from '../../src/lib/sound';
 import { haptic } from '../../src/lib/haptics';
+import { db } from '../../src/lib/firebase';
 import { pickImage } from '../../src/lib/image';
 import { confirmAction } from '../../src/lib/confirm';
 import { useProducts } from '../../src/context/ProductsContext';
@@ -19,9 +21,16 @@ import {
   updateCollection,
   useCollections,
 } from '../../src/lib/collections';
+import {
+  createFandom,
+  removeFandom,
+  updateFandom,
+  useFandoms,
+} from '../../src/lib/fandoms';
+import { SEED_OFFERS, seedOfferPrices } from '../../src/lib/seed';
 import { Btn, Card, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
-import type { Collection, StoreConfig } from '../../src/lib/types';
+import type { Collection, FandomTag, StoreConfig } from '../../src/lib/types';
 
 type Form = Omit<StoreConfig, 'lat' | 'lng' | 'shippingCost' | 'freeShippingThreshold'> & {
   lat: string;
@@ -43,6 +52,7 @@ export default function AdminSettings() {
   const { permission, enablePush } = useNotifications();
   const { products } = useProducts();
   const { collections } = useCollections();
+  const { fandoms } = useFandoms();
   const toast = useToast();
   const [form, setForm] = useState<Form>(toForm(config));
   const [busy, setBusy] = useState(false);
@@ -52,6 +62,12 @@ export default function AdminSettings() {
   const [collectionDescription, setCollectionDescription] = useState('');
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
   const [collectionBusy, setCollectionBusy] = useState(false);
+  const [fandomName, setFandomName] = useState('');
+  const [fandomShort, setFandomShort] = useState('');
+  const [fandomColor, setFandomColor] = useState<string>(C.pink);
+  const [editingFandom, setEditingFandom] = useState<string | null>(null);
+  const [fandomBusy, setFandomBusy] = useState(false);
+  const [offersBusy, setOffersBusy] = useState(false);
 
   useEffect(() => {
     // Keep the local draft in sync when the remote config changes (another admin edited it).
@@ -177,6 +193,121 @@ export default function AdminSettings() {
         toast.error('No se pudo borrar', 'Revisa tus permisos de administrador.');
       }
     }, 'Borrar');
+  };
+
+  const resetFandomDraft = () => {
+    setFandomName('');
+    setFandomShort('');
+    setFandomColor(C.pink);
+    setEditingFandom(null);
+  };
+
+  const saveFandom = async () => {
+    if (!fandomName.trim()) {
+      toast.error('Falta el nombre', 'Escribe un nombre para la etiqueta.');
+      return;
+    }
+    setFandomBusy(true);
+    try {
+      const patch = {
+        name: fandomName.trim(),
+        short: fandomShort.trim(),
+        color: fandomColor,
+      };
+      if (editingFandom) {
+        await updateFandom(editingFandom, patch);
+        toast.success('Etiqueta actualizada', patch.name);
+      } else {
+        await createFandom(patch);
+        playSound('offer');
+        toast.success('Etiqueta creada', patch.name);
+      }
+      resetFandomDraft();
+      haptic.success();
+    } catch {
+      toast.error('No se pudo guardar', 'Revisa tus permisos de administrador.');
+      haptic.error();
+    } finally {
+      setFandomBusy(false);
+    }
+  };
+
+  const startEditFandom = (item: FandomTag) => {
+    setEditingFandom(item.id);
+    setFandomName(item.name);
+    setFandomShort(item.short || '');
+    setFandomColor(item.color || C.pink);
+  };
+
+  const toggleFandom = async (item: FandomTag) => {
+    try {
+      await updateFandom(item.id, { active: item.active === false });
+      haptic.tap();
+    } catch {
+      toast.error('No se pudo actualizar', 'Revisa tus permisos de administrador.');
+    }
+  };
+
+  const deleteFandom = (item: FandomTag) => {
+    const usedBy = products.filter((product) => product.fandom === item.id).length;
+    if (usedBy > 0) {
+      toast.error(
+        'Etiqueta en uso',
+        `${usedBy} producto${usedBy === 1 ? '' : 's'} la usan. Cámbiala en esos productos primero.`
+      );
+      return;
+    }
+    confirmAction(`Borrar "${item.name}"`, 'La etiqueta desaparecerá del catálogo.', async () => {
+      try {
+        // El catálogo local puede ir desactualizado: se confirma contra Firestore.
+        const live = await getDocs(query(collection(db, 'products'), where('fandom', '==', item.id)));
+        if (!live.empty) {
+          toast.error(
+            'Etiqueta en uso',
+            `${live.size} producto${live.size === 1 ? '' : 's'} la usan. Cámbiala primero.`
+          );
+          return;
+        }
+        await removeFandom(item.id);
+        if (editingFandom === item.id) resetFandomDraft();
+        haptic.warning();
+        toast.info('Etiqueta borrada', item.name);
+      } catch {
+        toast.error('No se pudo borrar', 'Revisa tus permisos de administrador.');
+      }
+    }, 'Borrar');
+  };
+
+  const activateOffers = () => {
+    confirmAction(
+      'Activar ofertas de ejemplo',
+      `Se aplicarán ${SEED_OFFERS.length} bajadas de precio del catálogo demo. No se tocarán productos que ya tengan precio anterior.`,
+      async () => {
+        setOffersBusy(true);
+        try {
+          const count = await seedOfferPrices();
+          haptic.success();
+          if (count) {
+            playSound('offer');
+            toast.success(
+              'Ofertas activadas',
+              `${count} producto${count === 1 ? '' : 's'} muestran ahora su bajada en el catálogo.`
+            );
+          } else {
+            toast.info(
+              'Sin cambios',
+              'Los productos de ejemplo ya tenían precio anterior o cambiaron de precio.'
+            );
+          }
+        } catch {
+          haptic.error();
+          toast.error('No se pudieron activar', 'Revisa que tu usuario sea admin y las reglas estén publicadas.');
+        } finally {
+          setOffersBusy(false);
+        }
+      },
+      'Activar'
+    );
   };
 
   const pickQr = async () => {
@@ -332,6 +463,154 @@ export default function AdminSettings() {
               <Btn title="Cancelar" kind="ghost" compact onPress={resetCollectionDraft} />
             ) : null}
           </View>
+        </Card>
+
+        <Card style={{ gap: space.sm }}>
+          <SectionTitle icon="pricetags-outline" title="Etiquetas de fandom" />
+          <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
+            Renombra las etiquetas clásicas o crea otras nuevas. Las ocultas dejan de aparecer como
+            filtro, pero siguen identificando a los productos que ya las usan. Una etiqueta con
+            productos no se puede borrar.
+          </Text>
+
+          {fandoms.map((item) => {
+            const usedBy = products.filter((product) => product.fandom === item.id).length;
+            return (
+              <View
+                key={item.id}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: space.sm,
+                  padding: space.md,
+                  borderRadius: radius.md,
+                  backgroundColor: C.surfaceAlt,
+                  borderWidth: 1,
+                  borderColor: C.border,
+                }}
+              >
+                <View
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: item.color || C.pink,
+                    flexShrink: 0,
+                  }}
+                />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={{ color: C.ink, fontWeight: weight.bold, fontSize: typeScale.body }}>
+                    {item.name}
+                    {item.short ? ` · ${item.short}` : ''}
+                  </Text>
+                  <Text style={{ color: C.muted, fontSize: typeScale.caption }}>
+                    {usedBy} producto{usedBy === 1 ? '' : 's'} · {item.active === false ? 'Oculta' : 'Visible'}
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => startEditFandom(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Editar etiqueta ${item.name}`}
+                  hitSlop={8}
+                >
+                  <Ionicons name="create-outline" size={17} color={C.inkSoft} />
+                </Pressable>
+                <Pressable
+                  onPress={() => toggleFandom(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.active === false ? `Mostrar ${item.name}` : `Ocultar ${item.name}`}
+                  hitSlop={8}
+                >
+                  <Ionicons
+                    name={item.active === false ? 'eye-off-outline' : 'eye-outline'}
+                    size={17}
+                    color={C.inkSoft}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => deleteFandom(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Borrar etiqueta ${item.name}`}
+                  hitSlop={8}
+                >
+                  <Ionicons name="trash-outline" size={17} color={C.red} />
+                </Pressable>
+              </View>
+            );
+          })}
+
+          <Field
+            label={editingFandom ? 'Nombre de la etiqueta' : 'Nueva etiqueta'}
+            value={fandomName}
+            onChangeText={setFandomName}
+            placeholder="Ej. Bocchi, K-On!, Metal…"
+          />
+          <Field
+            label="Etiqueta corta (opcional)"
+            value={fandomShort}
+            onChangeText={setFandomShort}
+            placeholder="Texto breve para el badge"
+            containerStyle={{ marginBottom: 0 }}
+          />
+          <Text style={{ color: C.inkSoft, fontSize: typeScale.small, fontWeight: weight.semibold }}>
+            Color
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+            {FANDOM_PALETTE.map((tone) => {
+              const selected = fandomColor === tone.color;
+              return (
+                <Pressable
+                  key={tone.color}
+                  onPress={() => setFandomColor(tone.color)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Color ${tone.label}`}
+                  accessibilityState={{ selected }}
+                  hitSlop={6}
+                  style={({ pressed }) => [
+                    {
+                      width: 26,
+                      height: 26,
+                      borderRadius: 13,
+                      backgroundColor: tone.color,
+                      borderWidth: 2,
+                      borderColor: selected ? C.ink : C.card,
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                    { cursor: 'pointer' } as any,
+                  ]}
+                />
+              );
+            })}
+          </View>
+          <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
+            <Btn
+              title={editingFandom ? 'Guardar etiqueta' : 'Añadir etiqueta'}
+              icon={editingFandom ? 'checkmark' : 'add'}
+              compact
+              onPress={saveFandom}
+              loading={fandomBusy}
+            />
+            {editingFandom ? (
+              <Btn title="Cancelar" kind="ghost" compact onPress={resetFandomDraft} />
+            ) : null}
+          </View>
+        </Card>
+
+        <Card style={{ gap: space.sm }}>
+          <SectionTitle icon="pricetag-outline" title="Ofertas de ejemplo" />
+          <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
+            El catálogo demo trae {SEED_OFFERS.length} bajadas de precio. Actívalas para que el precio
+            tachado y el porcentaje se vean en las tarjetas. No se modifican ofertas que ya hayas
+            configurado a mano.
+          </Text>
+          <Btn
+            title="Activar ofertas de ejemplo"
+            icon="pricetag"
+            kind="soft"
+            compact
+            onPress={activateOffers}
+            loading={offersBusy}
+          />
         </Card>
 
         <Card style={{ gap: space.sm }}>

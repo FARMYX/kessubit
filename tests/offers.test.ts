@@ -106,6 +106,10 @@ describe('receiptHtml', () => {
     assert.match(html, /Bs 225,00/);
     assert.match(html, /no constituye una factura fiscal/);
     assert.match(html, /window\.print\(\)/);
+    assert.match(html, /Recibo de pedido/);
+    assert.match(html, /font-variant-numeric: tabular-nums/);
+    assert.match(html, /<svg[\s\S]*<rect/);
+    assert.doesNotMatch(html, /♪|♫/);
   });
 
   it('escapa datos del cliente para no inyectar HTML', () => {

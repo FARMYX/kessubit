@@ -9,13 +9,14 @@ import { useResponsive } from '../lib/responsive';
 type Props = {
   title: string;
   subtitle?: string;
+  /** Se conserva por compatibilidad; los encabezados ya no usan kickers. */
   eyebrow?: string;
   back?: boolean;
   right?: React.ReactNode;
   onBack?: () => void;
 };
 
-export function ScreenHeader({ title, subtitle, eyebrow, back, right, onBack }: Props) {
+export function ScreenHeader({ title, subtitle, back, right, onBack }: Props) {
   const router = useRouter();
   const { isDesktop } = useResponsive();
 
@@ -55,19 +56,6 @@ export function ScreenHeader({ title, subtitle, eyebrow, back, right, onBack }: 
       ) : null}
 
       <View style={{ flex: 1, gap: 3 }}>
-        {eyebrow ? (
-          <Text
-            style={{
-              color: C.pink,
-              fontSize: typeScale.caption,
-              fontWeight: weight.bold,
-              letterSpacing: 1.1,
-              textTransform: 'uppercase',
-            }}
-          >
-            {eyebrow}
-          </Text>
-        ) : null}
         <Text
           style={{
             color: C.ink,
