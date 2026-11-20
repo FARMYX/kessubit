@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="KESUUBIT">
+  <title>KESUUBIT</title>
+  <rect width="1024" height="1024" fill="#C93A72"/>
+  <g fill="none" stroke="#FFF8F3" opacity="0.17">
+    <circle cx="512" cy="512" r="420" stroke-width="5"/>
+    <circle cx="512" cy="512" r="478" stroke-width="3.5"/>
+  </g>
+  <circle cx="231" cy="899" r="9" fill="#F2C230" opacity="0.95"/>
+  <g transform="rotate(-12 512 512)">
+    <path d="M512 250 C590 250 655 292 668 360 C682 430 650 520 600 590 C560 646 530 710 512 775 C494 710 464 646 424 590 C374 520 342 430 356 360 C369 292 434 250 512 250 Z" fill="#8E2450" opacity="0.22" transform="translate(10 14)"/>
+    <path d="M512 250 C590 250 655 292 668 360 C682 430 650 520 600 590 C560 646 530 710 512 775 C494 710 464 646 424 590 C374 520 342 430 356 360 C369 292 434 250 512 250 Z" fill="#FFF8F3"/>
+    <g fill="#C93A72">
+      <ellipse cx="500" cy="558" rx="60" ry="42" transform="rotate(-18 500 558)"/>
+      <rect x="546" y="356" width="28" height="204" rx="14"/>
+      <path d="M562 368 C642 358 652 430 632 470 C626 436 606 414 576 410 Z"/>
+    </g>
+  </g>
+  <g fill="#F2C230">
+    <rect x="724" y="239" width="22" height="22" rx="3"/>
+    <rect x="724" y="211" width="22" height="22" rx="3"/>
+    <rect x="724" y="267" width="22" height="22" rx="3"/>
+    <rect x="696" y="239" width="22" height="22" rx="3"/>
+    <rect x="752" y="239" width="22" height="22" rx="3"/>
+  </g>
+  <rect x="286" y="300" width="16" height="16" rx="3" fill="#3F6FE0"/>
+  <path d="M250 711 L259 720 L250 729 L241 720 Z" fill="#FFF8F3" opacity="0.85"/>
+  <path d="M800 684 L806 690 L800 696 L794 690 Z" fill="#FFF8F3" opacity="0.7"/>
+</svg>

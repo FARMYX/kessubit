@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signed() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signed()
+        && get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isSelf(uid) {
+      return signed() && request.auth.uid == uid;
+    }
+
+    // Catálogo público. Las escrituras quedan reservadas a administradores;
+    // el stock lo mueven las Cloud Functions con privilegios de servidor.
+    match /products/{id} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create: if isSelf(uid)
+        && request.resource.data.role == 'client'
+        && request.resource.data.email is string;
+      allow update: if (isSelf(uid) && request.resource.data.role == resource.data.role)
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Los pedidos se crean, cambian de estado y se cancelan exclusivamente
+    // mediante Cloud Functions. El cliente solo lee los suyos.
+    match /orders/{id} {
+      allow read: if signed() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create, update, delete: if false;
+    }
+
+    // El comprobante sí lo sube el cliente: es una imagen pesada que no debe
+    // pasar por una Cloud Function. La verificación del pago la hace el admin
+    // desde el pedido, y las Functions pueden escribir con privilegios de servidor.
+    match /paymentProofs/{orderId} {
+      function orderData() {
+        return get(/databases/$(db)/documents/orders/$(orderId)).data;
+      }
+
+      allow read: if signed()
+        && (isAdmin() || orderData().userId == request.auth.uid);
+
+      allow create: if signed()
+        && orderData().userId == request.auth.uid
+        && orderData().paymentMethod in ['qr', 'transferencia']
+        && orderData().status != 'cancelado'
+        && (!('paymentStatus' in orderData()) || orderData().paymentStatus != 'verificado')
+        && request.resource.data.orderId == orderId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.image is string
+        && request.resource.data.image.size() > 0
+        && request.resource.data.image.size() <= 900000
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 1000000;
+
+      allow update: if signed()
+        && resource.data.userId == request.auth.uid
+        && orderData().status != 'cancelado'
+        && (!('paymentStatus' in orderData()) || orderData().paymentStatus != 'verificado')
+        && request.resource.data.orderId == orderId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.image is string
+        && request.resource.data.image.size() > 0
+        && request.resource.data.image.size() <= 900000
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 1000000
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'orderId', 'userId', 'image', 'amount', 'createdAt', 'updatedAt'
+        ]);
+
+      allow delete: if isAdmin();
+    }
+
+    // Bandeja personal + bandeja compartida de administración. Los avisos los
+    // genera el servidor; el usuario solo puede marcarlos como leídos.
+    match /notifications/{id} {
+      allow create: if false;
+      allow read: if signed()
+        && (resource.data.userId == request.auth.uid
+          || (resource.data.audience == 'admin' && isAdmin()));
+      allow update: if (signed()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']))
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']));
+      allow delete: if isAdmin();
+    }
+
+    // Una opinión por usuario y producto (id compuesto producto_usuario).
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if signed()
+        && request.resource.data.userId == request.auth.uid
+        && id == request.resource.data.productId + '_' + request.auth.uid
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 500;
+      allow update: if signed()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 500;
+      allow delete: if (signed() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // Configuración pública de la tienda, editable solo por admin.
+    match /storeConfig/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Colecciones temáticas públicas, gestionadas solo desde administración.
+    match /collections/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contador de números de pedido. Solo la Cloud Function lo incrementa con
+    // privilegios de servidor, dentro de la misma transacción del pedido.
+    match /counters/{id} {
+      allow read: if signed();
+      allow write: if false;
+    }
+  }
+}

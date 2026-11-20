@@ -1,0 +1,226 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signed() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signed()
+        && get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isSelf(uid) {
+      return signed() && request.auth.uid == uid;
+    }
+
+    // Catálogo público. Los administradores editan todo; un cliente solo puede
+    // mover el stock dentro de la transacción de un pedido.
+    match /products/{id} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (signed()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+          && request.resource.data.stock is number
+          && request.resource.data.stock >= 0
+          && request.resource.data.stock <= 100000);
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create: if isSelf(uid)
+        && request.resource.data.role == 'client'
+        && request.resource.data.email is string;
+      allow update: if (isSelf(uid) && request.resource.data.role == resource.data.role)
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Los pedidos nacen pendientes y con el total calculado por la app.
+    // El cliente solo puede cancelar mientras no haya salido del local.
+    match /orders/{id} {
+      allow create: if signed()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.idempotencyKey == id
+        && request.resource.data.status == 'pendiente'
+        && request.resource.data.orderNumber is string
+        && request.resource.data.userEmail is string
+        && request.resource.data.userName is string
+        && request.resource.data.address is string
+        && request.resource.data.phone is string
+        && request.resource.data.notes is string
+        && request.resource.data.deliveryType in ['delivery', 'pickup']
+        && request.resource.data.paymentMethod in ['efectivo', 'qr', 'transferencia', 'tarjeta']
+        && request.resource.data.paymentStatus in ['no_requiere', 'sin_comprobante']
+        && (
+          (request.resource.data.paymentMethod in ['qr', 'transferencia']
+            && request.resource.data.paymentStatus == 'sin_comprobante')
+          || (request.resource.data.paymentMethod in ['efectivo', 'tarjeta']
+            && request.resource.data.paymentStatus == 'no_requiere')
+        )
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && request.resource.data.statusHistory is list
+        && request.resource.data.statusHistory.size() > 0
+        && request.resource.data.subtotal is number
+        && request.resource.data.subtotal >= 0
+        && request.resource.data.shipping is number
+        && request.resource.data.shipping >= 0
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.total == request.resource.data.subtotal + request.resource.data.shipping;
+      allow read: if signed()
+        && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin()
+        || (signed()
+          && resource.data.userId == request.auth.uid
+          && resource.data.status in ['pendiente', 'preparando']
+          && request.resource.data.status == 'cancelado'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'statusHistory', 'cancelledAt', 'updatedAt'
+          ]))
+        // El dueño solo puede enviar el comprobante y sus metadatos. No puede
+        // marcar el pago como verificado ni tocar totales, estado o stock.
+        || (signed()
+          && resource.data.userId == request.auth.uid
+          && resource.data.paymentMethod in ['qr', 'transferencia']
+          && resource.data.status != 'cancelado'
+          && (!('paymentStatus' in resource.data) || resource.data.paymentStatus != 'verificado')
+          && request.resource.data.paymentStatus == 'en_revision'
+          && request.resource.data.paymentAmount is number
+          && request.resource.data.paymentAmount > 0
+          && request.resource.data.paymentAmount <= 1000000
+          && request.resource.data.proofUploadedAt is timestamp
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'paymentStatus', 'paymentAmount', 'proofUploadedAt', 'paymentRejectedReason', 'updatedAt'
+          ]));
+      allow delete: if isAdmin();
+    }
+
+    // Comprobantes de pago. La imagen se guarda aparte del pedido para que la
+    // lista de pedidos no cargue capturas de banca móvil. El cliente dueño
+    // escribe; el administrador lee y decide, pero no edita el comprobante.
+    match /paymentProofs/{orderId} {
+      function orderData() {
+        return get(/databases/$(db)/documents/orders/$(orderId)).data;
+      }
+
+      allow read: if signed()
+        && (isAdmin() || orderData().userId == request.auth.uid);
+
+      allow create: if signed()
+        && orderData().userId == request.auth.uid
+        && orderData().paymentMethod in ['qr', 'transferencia']
+        && orderData().status != 'cancelado'
+        && (!('paymentStatus' in orderData()) || orderData().paymentStatus != 'verificado')
+        && request.resource.data.orderId == orderId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.image is string
+        && request.resource.data.image.size() > 0
+        && request.resource.data.image.size() <= 900000
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 1000000
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      allow update: if signed()
+        && resource.data.userId == request.auth.uid
+        && orderData().status != 'cancelado'
+        && (!('paymentStatus' in orderData()) || orderData().paymentStatus != 'verificado')
+        && request.resource.data.orderId == orderId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.image is string
+        && request.resource.data.image.size() > 0
+        && request.resource.data.image.size() <= 900000
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 1000000
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'orderId', 'userId', 'image', 'amount', 'createdAt', 'updatedAt'
+        ]);
+
+      allow delete: if isAdmin();
+    }
+
+    // Bandeja personal + bandeja compartida de administración. El cliente crea
+    // sus propios avisos y el aviso dirigido a la tienda; no puede fabricar
+    // avisos para otras cuentas.
+    match /notifications/{id} {
+      allow create: if signed()
+        && (
+          request.resource.data.userId == request.auth.uid
+          || (request.resource.data.audience == 'admin' && request.resource.data.userId == null)
+          || isAdmin()
+        )
+        && request.resource.data.type in [
+          'order_created', 'order_status', 'order_cancelled',
+          'payment_proof', 'payment_verified', 'payment_rejected',
+          'welcome', 'test'
+        ]
+        && request.resource.data.title is string
+        && request.resource.data.body is string;
+      allow read: if signed()
+        && (resource.data.userId == request.auth.uid
+          || (resource.data.audience == 'admin' && isAdmin()));
+      allow update: if (signed()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']))
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']));
+      allow delete: if isAdmin();
+    }
+
+    // Una opinión por usuario y producto (id compuesto producto_usuario).
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if signed()
+        && request.resource.data.userId == request.auth.uid
+        && id == request.resource.data.productId + '_' + request.auth.uid
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 500;
+      allow update: if signed()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 500;
+      allow delete: if (signed() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+    }
+
+    // Configuración pública de la tienda, editable solo por admin.
+    match /storeConfig/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Colecciones temáticas públicas, gestionadas solo desde administración.
+    match /collections/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contador de números de pedido. La transacción solo puede subirlo de uno
+    // en uno, así nadie reinicia la numeración ni la salta a su antojo.
+    match /counters/{id} {
+      allow read: if signed();
+      allow create: if signed()
+        && request.resource.data.value is number
+        && request.resource.data.value == 1;
+      allow update: if signed()
+        && request.resource.data.value is number
+        && request.resource.data.value == resource.data.value + 1;
+      allow delete: if isAdmin();
+    }
+  }
+}
