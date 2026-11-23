@@ -67,10 +67,10 @@ export type OrderStatusEntry = {
 };
 
 export type DeliveryType = 'delivery' | 'pickup';
-export type PaymentMethod = 'efectivo' | 'qr' | 'transferencia' | 'tarjeta';
+export type PaymentMethod = 'efectivo' | 'qr' | 'transferencia';
 
 /**
- * Estado del comprobante de pago. `no_requiere` se usa en efectivo/tarjeta;
+ * Estado del comprobante de pago. `no_requiere` se usa en efectivo;
  * `sin_comprobante` en QR/transferencia hasta que el cliente sube la captura.
  */
 export type PaymentStatus =
@@ -182,6 +182,12 @@ export type StoreConfig = {
   pickupEnabled: boolean;
   /** Imagen del QR de la banca móvil, guardada como data URL JPEG. */
   qrImage?: string;
+  /** Banner principal del catálogo, guardado como data URL JPEG. */
+  heroImage?: string;
+  /** Titular editable del banner; si está vacío se usa el texto de KESUUBIT. */
+  heroTitle?: string;
+  /** Texto de apoyo editable del banner. */
+  heroSubtitle?: string;
   /** Titular de la cuenta que recibe el pago. */
   paymentHolder?: string;
   /** Instrucciones extra para pagar por QR o transferencia. */

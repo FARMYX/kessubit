@@ -12,7 +12,7 @@ const db = getFirestore();
 setGlobalOptions({ region: REGION });
 
 const DELIVERY_TYPES = ['delivery', 'pickup'] as const;
-const PAYMENT_METHODS = ['efectivo', 'qr', 'transferencia', 'tarjeta'] as const;
+const PAYMENT_METHODS = ['efectivo', 'qr', 'transferencia'] as const;
 const STATUSES = ['pendiente', 'preparando', 'enviado', 'entregado'] as const;
 const IDEMPOTENCY_RE = /^[A-Za-z0-9_-]{8,64}$/;
 

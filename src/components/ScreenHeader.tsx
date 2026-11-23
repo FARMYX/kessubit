@@ -132,7 +132,7 @@ export function IconButton({
             borderColor: C.bg,
           }}
         >
-          <Text style={{ color: '#fff', fontSize: 10, fontWeight: weight.black }}>
+          <Text style={{ color: C.onPink, fontSize: 10, fontWeight: weight.black }}>
             {badge > 9 ? '9+' : badge}
           </Text>
         </View>

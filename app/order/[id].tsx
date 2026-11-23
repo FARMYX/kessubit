@@ -9,13 +9,13 @@ import {
   C,
   DELIVERY_LABEL,
   PAYMENT_ICON,
-  PAYMENT_LABEL,
   PAYMENT_STATUS_COLOR,
   PAYMENT_STATUS_LABEL,
   STATUS_COLOR,
   STATUS_LABEL,
   STATUS_ORDER,
   money,
+  paymentLabel,
   paymentNeedsProof,
   paymentStatusOf,
 } from '../../src/lib/theme';
@@ -356,7 +356,7 @@ export default function OrderDetail() {
             />
             {order.phone ? <InfoRow icon="call-outline" label="Teléfono" value={order.phone} /> : null}
             {order.paymentMethod ? (
-              <InfoRow icon="card-outline" label="Pago" value={PAYMENT_LABEL[order.paymentMethod]} />
+              <InfoRow icon="card-outline" label="Pago" value={paymentLabel(order.paymentMethod)} />
             ) : null}
             {order.notes ? <InfoRow icon="document-text-outline" label="Notas" value={order.notes} /> : null}
           </Card>
@@ -384,7 +384,7 @@ export default function OrderDetail() {
             <InfoRow
               icon={(order.paymentMethod && (PAYMENT_ICON[order.paymentMethod] as keyof typeof Ionicons.glyphMap)) || 'card-outline'}
               label="Método"
-              value={order.paymentMethod ? PAYMENT_LABEL[order.paymentMethod] : 'Por coordinar'}
+              value={order.paymentMethod ? paymentLabel(order.paymentMethod) : 'Por coordinar'}
             />
 
             {!requiresProof ? (
@@ -812,7 +812,7 @@ function AmountMismatch({ declared, total }: { declared: number; total: number }
         borderRadius: radius.sm,
         backgroundColor: C.redSoft,
         borderWidth: 1,
-        borderColor: '#F3C6CB',
+        borderColor: C.pinkSoft,
       }}
     >
       <Ionicons name="warning" size={16} color={C.red} />

@@ -28,12 +28,7 @@ export type CreateOrderResult = {
 type StatusStep = Exclude<OrderStatus, 'cancelado'>;
 
 const DELIVERY_TYPES: CheckoutInput['deliveryType'][] = ['delivery', 'pickup'];
-const PAYMENT_METHODS: CheckoutInput['paymentMethod'][] = [
-  'efectivo',
-  'qr',
-  'transferencia',
-  'tarjeta',
-];
+const PAYMENT_METHODS: CheckoutInput['paymentMethod'][] = ['efectivo', 'qr', 'transferencia'];
 const IDEMPOTENCY_RE = /^[A-Za-z0-9_-]{8,64}$/;
 /** Firestore limita el documento a 1 MiB; dejamos margen para los metadatos. */
 const PROOF_MAX_CHARS = 900_000;

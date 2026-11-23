@@ -58,6 +58,9 @@ export default function Catalog() {
   const { collections } = useCollections();
   const pendingProof = usePendingProofOrder();
   const toast = useToast();
+  const hasHeroImage = !!config.heroImage;
+  const heroInk = hasHeroImage ? '#FFF8F3' : C.ink;
+  const heroInkSoft = hasHeroImage ? 'rgba(255,248,243,0.86)' : C.inkSoft;
 
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('Todas');
@@ -186,7 +189,7 @@ export default function Catalog() {
             gap: space.sm,
             backgroundColor: C.pinkWash,
             borderWidth: 1,
-            borderColor: '#F6D6E4',
+            borderColor: C.pinkSoft,
             borderRadius: radius.md,
             paddingVertical: 9,
             paddingHorizontal: space.md,
@@ -204,15 +207,35 @@ export default function Catalog() {
 
       <View
         style={{
-          backgroundColor: C.pinkWash,
+          get backgroundColor() { return C.pinkWash; },
           borderRadius: radius['2xl'],
           borderWidth: 1,
-          borderColor: '#F3D2E1',
+          get borderColor() { return C.pinkSoft; },
           padding: isDesktop ? space['3xl'] : space.xl,
           marginBottom: space.lg,
           overflow: 'hidden',
         }}
       >
+        {config.heroImage ? (
+          <>
+            <Image
+              source={{ uri: config.heroImage }}
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+              contentFit="cover"
+              accessibilityIgnoresInvertColors
+            />
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: C.overlay,
+              }}
+            />
+          </>
+        ) : null}
         <View style={{ flexDirection: 'row', gap: space.xl, alignItems: 'center' }}>
           <View style={{ flex: 1, gap: space.md }}>
             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
@@ -225,7 +248,7 @@ export default function Catalog() {
             </View>
             <Text
               style={{
-                color: C.ink,
+                color: heroInk,
                 fontSize: isDesktop ? 38 : 28,
                 lineHeight: (isDesktop ? 38 : 28) * 1.1,
                 fontWeight: weight.black,
@@ -233,11 +256,11 @@ export default function Catalog() {
                 maxWidth: 520,
               }}
             >
-              Equipa tu banda.{'\n'}Suena como tú.
+              {config.heroTitle || "Equipa tu banda.\nSuena como tú."}
             </Text>
-            <Text style={{ color: C.inkSoft, fontSize: isDesktop ? 15 : 13.5, lineHeight: 21, maxWidth: 460 }}>
-              Guitarras, bajos, baterías y accesorios elegidos para quienes viven entre riffs y
-              escenarios.
+            <Text style={{ color: heroInkSoft, fontSize: isDesktop ? 15 : 13.5, lineHeight: 21, maxWidth: 460 }}>
+              {config.heroSubtitle ||
+                'Guitarras, bajos, baterías y accesorios elegidos para quienes viven entre riffs y escenarios.'}
             </Text>
             <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', marginTop: 2 }}>
               <Pressable
@@ -256,8 +279,8 @@ export default function Catalog() {
                   { cursor: 'pointer' } as any,
                 ]}
               >
-                <Ionicons name="git-branch" size={16} color="#fff" />
-                <Text style={{ color: '#fff', fontWeight: weight.bold, fontSize: typeScale.body }}>Ver guitarras</Text>
+                <Ionicons name="git-branch" size={16} color={C.onPink} />
+                <Text style={{ color: C.onPink, fontWeight: weight.bold, fontSize: typeScale.body }}>Ver guitarras</Text>
               </Pressable>
               <Pressable
                 onPress={() => setCat('Accesorios')}
@@ -540,7 +563,7 @@ export default function Catalog() {
               borderRadius: radius.md,
               backgroundColor: pressed ? C.yellowSoft : C.surfaceAlt,
               borderWidth: 1,
-              borderColor: '#F0D98A',
+              borderColor: C.yellowDeep,
             },
             { cursor: 'pointer' } as any,
           ]}
@@ -705,7 +728,7 @@ const fandomTag = (color: string) => ({
   borderColor: color,
   paddingHorizontal: 9,
   paddingVertical: 4,
-  backgroundColor: 'rgba(255,255,255,0.6)',
+  backgroundColor: C.card,
 });
 
 const fandomText = (color: string) => ({
@@ -720,7 +743,7 @@ const sticker = {
   width: 150,
   borderRadius: radius.md,
   borderWidth: 1,
-  borderColor: C.border,
+  get borderColor() { return C.border; },
   padding: 11,
   gap: 2,
   shadowColor: '#2A1626',
@@ -731,13 +754,13 @@ const sticker = {
 };
 
 const stickerTitle = {
-  color: C.ink,
+  get color() { return C.ink; },
   fontWeight: weight.bold,
   fontSize: 12,
   marginTop: 2,
 };
 
 const stickerSub = {
-  color: C.muted,
+  get color() { return C.muted; },
   fontSize: 10,
 };

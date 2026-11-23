@@ -31,9 +31,9 @@ const ToastCtx = createContext<Ctx>(null as any);
 export const useToast = () => useContext(ToastCtx);
 
 const palette: Record<ToastKind, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string; border: string }> = {
-  success: { icon: 'checkmark-circle', color: C.green, bg: C.greenSoft, border: '#BFE6D2' },
-  error: { icon: 'alert-circle', color: C.red, bg: C.redSoft, border: '#F3C9CC' },
-  info: { icon: 'information-circle', color: C.blue, bg: C.blueSoft, border: '#C9D8FB' },
+  success: { icon: 'checkmark-circle', get color() { return C.green; }, get bg() { return C.greenSoft; }, get border() { return C.green; } },
+  error: { icon: 'alert-circle', get color() { return C.red; }, get bg() { return C.redSoft; }, get border() { return C.red; } },
+  info: { icon: 'information-circle', get color() { return C.blue; }, get bg() { return C.blueSoft; }, get border() { return C.blue; } },
 };
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

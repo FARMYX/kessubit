@@ -12,7 +12,7 @@ Se construyó KESUUBIT como una aplicación multiplataforma con **Expo SDK 58, R
 | 2 | Catálogo | 40 productos, búsqueda, filtros por categoría y fandom, productos destacados, aviso y filtro de últimas unidades | Implementado |
 | 3 | Ficha de producto | Imágenes, especificaciones, disponibilidad con aviso de stock bajo, opiniones y valoración, favoritos | Implementado |
 | 4 | Carrito | Cantidades, validación de stock, subtotal y persistencia local | Implementado |
-| 5 | Checkout | Envío o retiro, métodos de pago visibles (efectivo, QR, transferencia y tarjeta), validación de datos y creación del pedido en una transacción de Firestore | Implementado |
+| 5 | Checkout | Envío o retiro, métodos de pago visibles (efectivo, QR y transferencia), validación de datos y creación del pedido en una transacción de Firestore | Implementado |
 | 6 | Pedidos | Lista, detalle, número único, estados, línea de tiempo y cancelación con reposición de stock en la misma transacción | Implementado |
 | 7 | Notificaciones | Bandeja in-app, contador de no leídas, avisos locales, sonido temático y token push | Implementado |
 | 8 | Pagos con QR y comprobante | El administrador publica la imagen del QR, el cliente paga desde su banca móvil y sube el comprobante con el monto; el administrador lo aprueba o lo rechaza con motivo | Implementado |

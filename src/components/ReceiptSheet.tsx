@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   C,
   DELIVERY_LABEL,
-  PAYMENT_LABEL,
+  paymentLabel,
   PAYMENT_STATUS_COLOR,
   PAYMENT_STATUS_LABEL,
   STATUS_LABEL,
@@ -31,7 +31,7 @@ const Mark = () => (
     }}
   >
     {[9, 17, 13, 7].map((height, index) => (
-      <View key={index} style={{ width: 3, height, borderRadius: 2, backgroundColor: '#fff' }} />
+      <View key={index} style={{ width: 3, height, borderRadius: 2, backgroundColor: C.onPink }} />
     ))}
   </View>
 );
@@ -116,7 +116,7 @@ export function ReceiptSheet({ order, visible, onClose }: { order: Order; visibl
               <Row label="Contacto" value={`${order.userEmail || ''}${order.phone ? ` · ${order.phone}` : ''}`} />
               <Row label="Entrega" value={order.deliveryType ? DELIVERY_LABEL[order.deliveryType] : ''} />
               <Row label="Dirección" value={order.address} />
-              <Row label="Pago" value={order.paymentMethod ? PAYMENT_LABEL[order.paymentMethod] : ''} />
+              <Row label="Pago" value={paymentLabel(order.paymentMethod)} />
               <View style={{ flexDirection: 'row', gap: space.md, paddingVertical: 6, alignItems: 'center' }}>
                 <Text style={{ width: 92, color: C.muted, fontSize: typeScale.small }}>Verificación</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>

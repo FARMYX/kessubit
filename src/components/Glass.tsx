@@ -4,6 +4,7 @@ import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C } from '../lib/theme';
+import { useTheme } from '../context/ThemeContext';
 import { layout, radius, weight } from '../lib/design';
 
 /**
@@ -14,6 +15,7 @@ import { layout, radius, weight } from '../lib/design';
 export function useGlassTabs() {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const { scheme } = useTheme();
   const isDesktop = width >= layout.desktopBreakpoint;
 
   if (isDesktop) {
@@ -124,7 +126,7 @@ export function useGlassTabs() {
       <View style={[StyleSheet.absoluteFill, { borderRadius: 33, overflow: 'hidden' }]}>
         <BlurView
           intensity={Platform.OS === 'web' ? 40 : 70}
-          tint="light"
+          tint={scheme === 'dark' ? 'dark' : 'light'}
           blurMethod="dimezisBlurView"
           style={StyleSheet.absoluteFill}
         />
@@ -132,9 +134,9 @@ export function useGlassTabs() {
           style={[
             StyleSheet.absoluteFill,
             {
-              backgroundColor: Platform.OS === 'web' ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.55)',
+              backgroundColor: C.glass,
               borderWidth: 1,
-              borderColor: 'rgba(255,255,255,0.95)',
+              borderColor: C.glassBorder,
               borderRadius: 33,
             },
           ]}

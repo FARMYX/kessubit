@@ -57,7 +57,7 @@ El **comercio electrónico** es la compra y venta de bienes o servicios mediante
 
 El proceso de compra suele describirse en etapas: **descubrimiento** del producto, **consideración** (comparación, dudas), **compra** y **retención** (seguimiento, recompra). Dos problemas frecuentes son el **abandono del carrito**, asociado a costos ocultos, formularios largos o falta de confianza, y la **sobreventa**, que ocurre cuando se confirma un producto que ya no está disponible.
 
-En el contexto boliviano conviven el pago contra entrega, la transferencia bancaria, el QR y la coordinación directa con la tienda. KESUUBIT adopta un modelo mixto: **retiro en tienda** o **envío a domicilio**, con costo de envío y umbral de envío gratuito configurables. El checkout ofrece efectivo, tarjeta, transferencia y QR; en los dos últimos el cliente paga desde su banca móvil y sube un comprobante con el monto, que el administrador verifica manualmente. La aplicación no cobra en línea, pero deja el flujo preparado para incorporar una pasarela en el futuro.
+En el contexto boliviano conviven el pago contra entrega, la transferencia bancaria, el QR y la coordinación directa con la tienda. KESUUBIT adopta un modelo mixto: **retiro en tienda** o **envío a domicilio**, con costo de envío y umbral de envío gratuito configurables. El checkout ofrece efectivo, transferencia y QR; en los dos últimos el cliente paga desde su banca móvil y sube un comprobante con el monto, que el administrador verifica manualmente. La aplicación no cobra en línea, pero deja el flujo preparado para incorporar una pasarela en el futuro.
 
 ### 2.2.4 Gestión de inventario y pedidos
 
@@ -135,7 +135,7 @@ La **calidad** se trabajó en varios niveles: tipado estático con **TypeScript*
 
 En Bolivia, el uso de tecnologías de la información se enmarca en la **Ley N.º 164 de 2011 (Ley General de Telecomunicaciones, Tecnologías de Información y Comunicación)**, que reconoce el acceso a las TIC y regula los servicios de telecomunicaciones. La protección de los derechos del consumidor se apoya en la **Ley N.º 453 de 2013 (Ley General de los Derechos de las Usuarias y los Usuarios y de las Consumidoras y los Consumidores)**, que establece el derecho a la información veraz, a la seguridad y a un trato equitativo.
 
-Para el proyecto se aplican además principios de **privacidad desde el diseño**: solicitar solo los datos necesarios (nombre, teléfono, correo y dirección de entrega), informar para qué se usan, pedir consentimiento antes de enviar notificaciones y permitir desactivarlas. La aplicación no almacena datos de tarjetas ni procesa pagos en línea. Se recomienda revisar la normativa vigente y las políticas de Firebase/Google al momento de publicar, e incluir una política de privacidad accesible desde la aplicación.
+Para el proyecto se aplican además principios de **privacidad desde el diseño**: solicitar solo los datos necesarios (nombre, teléfono, correo y dirección de entrega), informar para qué se usan, pedir consentimiento antes de enviar notificaciones y permitir desactivarlas. La aplicación no almacena datos de pago ni procesa cobros en línea. Se recomienda revisar la normativa vigente y las políticas de Firebase/Google al momento de publicar, e incluir una política de privacidad accesible desde la aplicación.
 
 > **Nota:** si tu universidad exige un marco legal más amplio, se pueden añadir normas sobre comercio electrónico, firmas digitales y protección de datos personales, verificando siempre su vigencia.
 

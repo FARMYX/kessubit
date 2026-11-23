@@ -17,14 +17,14 @@ import { Skeleton } from '../src/components/Skeleton';
 import type { AppNotification } from '../src/lib/types';
 
 const ICONS: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
-  order_created: { icon: 'bag-check', color: C.green, bg: C.greenSoft },
-  order_status: { icon: 'cube', color: C.blue, bg: C.blueSoft },
-  order_cancelled: { icon: 'close-circle', color: C.red, bg: C.redSoft },
-  payment_proof: { icon: 'qr-code', color: C.blue, bg: C.blueSoft },
-  payment_verified: { icon: 'shield-checkmark', color: C.green, bg: C.greenSoft },
-  payment_rejected: { icon: 'alert-circle', color: C.red, bg: C.redSoft },
-  welcome: { icon: 'sparkles', color: C.pink, bg: C.pinkSoft },
-  test: { icon: 'notifications', color: C.pink, bg: C.pinkSoft },
+  order_created: { icon: 'bag-check', get color() { return C.green; }, get bg() { return C.greenSoft; } },
+  order_status: { icon: 'cube', get color() { return C.blue; }, get bg() { return C.blueSoft; } },
+  order_cancelled: { icon: 'close-circle', get color() { return C.red; }, get bg() { return C.redSoft; } },
+  payment_proof: { icon: 'qr-code', get color() { return C.blue; }, get bg() { return C.blueSoft; } },
+  payment_verified: { icon: 'shield-checkmark', get color() { return C.green; }, get bg() { return C.greenSoft; } },
+  payment_rejected: { icon: 'alert-circle', get color() { return C.red; }, get bg() { return C.redSoft; } },
+  welcome: { icon: 'sparkles', get color() { return C.pink; }, get bg() { return C.pinkSoft; } },
+  test: { icon: 'notifications', get color() { return C.pink; }, get bg() { return C.pinkSoft; } },
 };
 
 export default function NotificationsScreen() {
@@ -146,7 +146,7 @@ export default function NotificationsScreen() {
             value={soundOn}
             onValueChange={toggleSound}
             trackColor={{ false: C.borderStrong, true: C.pinkSoft }}
-            thumbColor={soundOn ? C.pink : '#fff'}
+            thumbColor={soundOn ? C.onPink : C.card}
             accessibilityLabel="Sonidos de la app"
           />
         </View>
@@ -190,7 +190,7 @@ export default function NotificationsScreen() {
                     padding: space.md,
                     borderRadius: radius.lg,
                     borderWidth: 1,
-                    borderColor: isUnread ? '#F3C6DB' : C.border,
+                    borderColor: isUnread ? C.pinkSoft : C.border,
                     backgroundColor: isUnread ? C.pinkWash : pressed ? C.bgAlt : C.card,
                   },
                   { cursor: 'pointer' } as any,

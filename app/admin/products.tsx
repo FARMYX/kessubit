@@ -343,7 +343,7 @@ export default function AdminProducts() {
                 borderRadius: radius.sm,
                 backgroundColor: offerPreview.active ? C.pinkWash : C.surfaceAlt,
                 borderWidth: 1,
-                borderColor: offerPreview.active ? '#F3D2E1' : C.border,
+                borderColor: offerPreview.active ? C.pinkSoft : C.border,
               }}
             >
               <Ionicons
@@ -491,7 +491,7 @@ export default function AdminProducts() {
               borderRadius: radius.md,
               backgroundColor: pressed ? C.yellowSoft : C.surfaceAlt,
               borderWidth: 1,
-              borderColor: '#F0D98A',
+              borderColor: C.yellowDeep,
             },
             { cursor: 'pointer' } as any,
           ]}
@@ -670,13 +670,13 @@ function IconAction({
 }
 
 const sectionLabel = {
-  color: C.ink,
+  get color() { return C.ink; },
   fontWeight: weight.black as any,
   fontSize: typeScale.title,
 };
 
 const subLabel = {
-  color: C.inkSoft,
+  get color() { return C.inkSoft; },
   fontSize: typeScale.small,
   fontWeight: weight.semibold as any,
   marginTop: 2,

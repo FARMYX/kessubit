@@ -130,7 +130,7 @@ export default function Dashboard() {
           backgroundColor: C.pinkWash,
           borderRadius: radius['2xl'],
           borderWidth: 1,
-          borderColor: '#F3D2E1',
+          borderColor: C.pinkSoft,
           padding: isDesktop ? space['3xl'] : space.xl,
           marginTop: space.sm,
           marginBottom: space.lg,
@@ -389,7 +389,7 @@ export default function Dashboard() {
                   borderRadius: radius.md,
                   backgroundColor: pressed ? C.yellowSoft : C.surfaceAlt,
                   borderWidth: 1,
-                  borderColor: '#F0D98A',
+                  borderColor: C.yellowDeep,
                 },
                 { cursor: 'pointer' } as any,
               ]}
@@ -428,7 +428,7 @@ export default function Dashboard() {
                   borderRadius: radius.md,
                   backgroundColor: pressed ? C.bgAlt : C.pinkWash,
                   borderWidth: 1,
-                  borderColor: '#F3D2E1',
+                  borderColor: C.pinkSoft,
                 },
                 { cursor: 'pointer' } as any,
               ]}
@@ -470,9 +470,9 @@ function HeroPill({
         paddingVertical: 8,
         paddingHorizontal: space.md,
         borderRadius: radius.pill,
-        backgroundColor: alert ? C.card : 'rgba(255,255,255,0.65)',
+        backgroundColor: alert ? C.card : C.surfaceAlt,
         borderWidth: 1,
-        borderColor: alert ? '#C9D8FB' : '#F3D2E1',
+        borderColor: alert ? C.blueSoft : C.pinkSoft,
       }}
     >
       <Ionicons name={icon} size={15} color={alert ? C.blue : C.pink} />
@@ -629,7 +629,7 @@ function Shortcut({
 }
 
 const sectionEyebrow = {
-  color: C.pink,
+  get color() { return C.pink; },
   fontSize: typeScale.caption,
   fontWeight: weight.black as any,
   letterSpacing: 1.1,

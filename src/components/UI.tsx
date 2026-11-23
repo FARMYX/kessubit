@@ -166,10 +166,10 @@ export function Btn({
   compact?: boolean;
 }) {
   const tones: Record<BtnKind, { bg: string; border: string; text: string }> = {
-    primary: { bg: C.pink, border: C.pink, text: '#fff' },
+    primary: { bg: C.pink, border: C.pink, text: C.onPink },
     soft: { bg: C.pinkSoft, border: C.pinkSoft, text: C.pink },
     ghost: { bg: C.card, border: C.borderStrong, text: C.ink },
-    danger: { bg: C.red, border: C.red, text: '#fff' },
+    danger: { bg: C.red, border: C.red, text: C.onPink },
     dangerSoft: { bg: C.redSoft, border: C.redSoft, text: C.red },
   };
   const tone = tones[kind];
@@ -309,8 +309,8 @@ export function Chip({
         Platform.OS === 'web' ? ({ cursor: disabled ? 'default' : 'pointer', outlineStyle: 'none' } as any) : null,
       ]}
     >
-      {icon ? <Ionicons name={icon} size={14} color={on ? '#fff' : C.inkSoft} /> : null}
-      <Text style={{ color: on ? '#fff' : C.ink, fontWeight: weight.semibold, fontSize: typeScale.small }}>
+      {icon ? <Ionicons name={icon} size={14} color={on ? C.onPink : C.inkSoft} /> : null}
+      <Text style={{ color: on ? C.onPink : C.ink, fontWeight: weight.semibold, fontSize: typeScale.small }}>
         {label}
       </Text>
     </Pressable>
@@ -320,7 +320,7 @@ export function Chip({
 export function Badge({
   label,
   color,
-  textColor = '#fff',
+  textColor = C.onPink,
   soft,
 }: {
   label: string;
@@ -531,7 +531,7 @@ export function ProductCard({
                 paddingHorizontal: 8,
                 paddingVertical: 4,
                 borderWidth: 1,
-                borderColor: '#F0D98A',
+                borderColor: C.yellowDeep,
               }}
             >
               <Text style={{ color: C.yellowDeep, fontSize: typeScale.caption, fontWeight: weight.bold }}>
@@ -647,7 +647,7 @@ export function ProductCard({
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: 'rgba(255,255,255,0.92)',
+              backgroundColor: C.card,
               alignItems: 'center',
               justifyContent: 'center',
               borderWidth: 1,
@@ -678,7 +678,7 @@ export function ProductCard({
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="add" size={19} color={soldOut ? C.muted : '#fff'} />
+            <Ionicons name="add" size={19} color={soldOut ? C.muted : C.onPink} />
           </Pressable>
         ) : null}
       </View>
@@ -704,7 +704,7 @@ export function Avatar({ uri, name, size = 44 }: { uri?: string; name?: string; 
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#F3C6DB',
+        borderColor: C.pinkSoft,
       }}
     >
       <Text style={{ color: C.pink, fontWeight: weight.black, fontSize: size * 0.36 }}>{initials(name)}</Text>

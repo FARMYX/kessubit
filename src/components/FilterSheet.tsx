@@ -204,7 +204,7 @@ export function FilterSheet({
 }
 
 const sectionLabel = {
-  color: C.inkSoft,
+  get color() { return C.inkSoft; },
   fontSize: typeScale.small,
   fontWeight: weight.bold,
   textTransform: 'uppercase' as const,

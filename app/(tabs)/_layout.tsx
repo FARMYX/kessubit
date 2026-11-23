@@ -44,7 +44,7 @@ export default function TabsLayout() {
           title: 'Carrito',
           tabBarIcon: makeIcon('bag-handle', 'bag-handle-outline'),
           tabBarBadge: count || undefined,
-          tabBarBadgeStyle: { backgroundColor: C.pink, color: '#fff', fontSize: 10, fontWeight: '800' },
+          tabBarBadgeStyle: { backgroundColor: C.pink, color: C.onPink, fontSize: 10, fontWeight: '800' },
         }}
       />
       <Tabs.Screen

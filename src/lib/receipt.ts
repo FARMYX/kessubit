@@ -1,7 +1,7 @@
 import {
   C,
   DELIVERY_LABEL,
-  PAYMENT_LABEL,
+  paymentLabel,
   PAYMENT_STATUS_COLOR,
   PAYMENT_STATUS_LABEL,
   STATUS_LABEL,
@@ -157,7 +157,7 @@ export function receiptHtml(order: Order): string {
         <div><dt>Contacto</dt><dd>${esc(order.userEmail)}${order.phone ? ` · ${esc(order.phone)}` : ''}</dd></div>
         <div><dt>Entrega</dt><dd>${esc(order.deliveryType ? DELIVERY_LABEL[order.deliveryType] : 'Por coordinar')}</dd></div>
         <div><dt>Dirección</dt><dd>${esc(order.address) || 'Por coordinar'}</dd></div>
-        <div><dt>Pago</dt><dd>${esc(order.paymentMethod ? PAYMENT_LABEL[order.paymentMethod] : 'Por coordinar')}</dd></div>
+        <div><dt>Pago</dt><dd>${esc(paymentLabel(order.paymentMethod))}</dd></div>
         <div>
           <dt>Verificación</dt>
           <dd><span class="status">${esc(PAYMENT_STATUS_LABEL[status])}${order.verifiedByName ? ` · ${esc(order.verifiedByName)}` : ''}</span></dd>

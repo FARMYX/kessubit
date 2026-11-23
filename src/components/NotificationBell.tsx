@@ -46,7 +46,7 @@ export function NotificationBell({ size = 42, showLabel = false }: { size?: numb
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 10, fontWeight: weight.black }}>
+            <Text style={{ color: C.onPink, fontSize: 10, fontWeight: weight.black }}>
               {unread > 9 ? '9+' : unread}
             </Text>
           </View>
@@ -93,7 +93,7 @@ export function NotificationBell({ size = 42, showLabel = false }: { size?: numb
             borderColor: C.bg,
           }}
         >
-          <Text style={{ color: '#fff', fontSize: 10, fontWeight: weight.black }}>
+          <Text style={{ color: C.onPink, fontSize: 10, fontWeight: weight.black }}>
             {unread > 9 ? '9+' : unread}
           </Text>
         </View>

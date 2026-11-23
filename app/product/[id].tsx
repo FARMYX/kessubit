@@ -296,7 +296,7 @@ export default function ProductScreen() {
                 borderRadius: radius.md,
                 backgroundColor: C.pinkWash,
                 borderWidth: 1,
-                borderColor: '#F3D2E1',
+                borderColor: C.pinkSoft,
               }}
             >
               <Ionicons name="pricetag" size={16} color={C.pink} />
@@ -316,7 +316,7 @@ export default function ProductScreen() {
                 borderRadius: radius.md,
                 backgroundColor: stockSoftColor(product.stock, product.lowStockThreshold),
                 borderWidth: 1,
-                borderColor: soldOut ? '#F3C6CB' : '#F0D98A',
+                borderColor: soldOut ? C.pinkSoft : C.yellowDeep,
               }}
             >
               <Ionicons
@@ -404,7 +404,7 @@ export default function ProductScreen() {
                 onPress={() => router.push('/admin/products' as any)}
                 style={({ pressed }) => [
                   miniFeature,
-                  { backgroundColor: pressed ? C.bgAlt : C.pinkWash, borderColor: '#F3D2E1' },
+                  { backgroundColor: pressed ? C.bgAlt : C.pinkWash, borderColor: C.pinkSoft },
                   { cursor: 'pointer' } as any,
                 ]}
               >
@@ -529,12 +529,12 @@ const miniFeature = {
   paddingHorizontal: 10,
   borderRadius: radius.sm,
   borderWidth: 1,
-  borderColor: C.border,
-  backgroundColor: C.card,
+  get borderColor() { return C.border; },
+  get backgroundColor() { return C.card; },
 };
 
 const miniFeatureText = {
-  color: C.inkSoft,
+  get color() { return C.inkSoft; },
   fontSize: typeScale.caption,
   fontWeight: weight.semibold,
 };

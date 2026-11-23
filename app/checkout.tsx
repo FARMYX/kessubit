@@ -530,7 +530,7 @@ function PaymentCard({
           justifyContent: 'center',
           backgroundColor: selected ? C.pinkSoft : C.surfaceAlt,
           borderWidth: 1,
-          borderColor: selected ? '#F3C6DB' : C.border,
+          borderColor: selected ? C.pinkSoft : C.border,
         }}
       >
         <Ionicons
@@ -556,23 +556,25 @@ function PaymentCard({
   );
 }
 
+// Getters: React Native lee estas propiedades al aplicar el estilo, así que
+// siguen la paleta activa cuando el usuario cambia entre tema claro y oscuro.
 const proofCallout = {
   flexDirection: 'row' as const,
   gap: space.sm,
   alignItems: 'flex-start' as const,
   padding: space.md,
   borderRadius: radius.md,
-  backgroundColor: C.yellowSoft,
+  get backgroundColor() { return C.yellowSoft; },
   borderWidth: 1,
-  borderColor: '#F0D98A',
+  get borderColor() { return C.yellow; },
   maxWidth: 440,
 };
 
 const amountPill = {
-  backgroundColor: C.pinkWash,
+  get backgroundColor() { return C.pinkWash; },
   borderRadius: radius.pill,
   borderWidth: 1,
-  borderColor: '#F3D2E1',
+  get borderColor() { return C.pinkSoft; },
   paddingHorizontal: space.md,
   paddingVertical: 6,
 };
@@ -581,18 +583,18 @@ const qrPanel = {
   gap: space.md,
   padding: space.md,
   borderRadius: radius.lg,
-  backgroundColor: C.surfaceAlt,
+  get backgroundColor() { return C.surfaceAlt; },
   borderWidth: 1,
-  borderColor: C.border,
+  get borderColor() { return C.border; },
 };
 
 const qrFrame = {
   width: 196,
   height: 196,
   borderRadius: radius.md,
-  backgroundColor: '#fff',
+  get backgroundColor() { return C.card; },
   borderWidth: 1,
-  borderColor: C.border,
+  get borderColor() { return C.border; },
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
   padding: 8,
@@ -604,7 +606,7 @@ const proofNote = {
   alignItems: 'flex-start' as const,
   padding: space.sm,
   borderRadius: radius.sm,
-  backgroundColor: C.blueSoft,
+  get backgroundColor() { return C.blueSoft; },
 };
 
 const transferPanel = {
@@ -613,9 +615,9 @@ const transferPanel = {
   alignItems: 'flex-start' as const,
   padding: space.md,
   borderRadius: radius.md,
-  backgroundColor: C.blueSoft,
+  get backgroundColor() { return C.blueSoft; },
   borderWidth: 1,
-  borderColor: '#C9D8FB',
+  get borderColor() { return C.blue; },
 };
 
 const cashNote = {
@@ -624,7 +626,7 @@ const cashNote = {
   alignItems: 'flex-start' as const,
   padding: space.sm,
   borderRadius: radius.sm,
-  backgroundColor: C.greenSoft,
+  get backgroundColor() { return C.greenSoft; },
 };
 
 const pickupBox = {
@@ -633,8 +635,8 @@ const pickupBox = {
   alignItems: 'flex-start' as const,
   padding: space.md,
   borderRadius: radius.md,
-  backgroundColor: C.blueSoft,
+  get backgroundColor() { return C.blueSoft; },
   borderWidth: 1,
-  borderColor: '#C9D8FB',
+  get borderColor() { return C.blue; },
   marginBottom: space.md,
 };

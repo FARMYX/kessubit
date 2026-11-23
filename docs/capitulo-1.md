@@ -160,7 +160,7 @@ Las hipótesis nulas se contrastan con los indicadores de la sección 1.4.4; si 
 
 **Limitaciones**
 
-- El pago se coordina con la tienda: efectivo o tarjeta al confirmar, o QR/transferencia con comprobante y verificación manual del administrador. No se integra una pasarela de pago en línea.
+- El pago se coordina con la tienda: efectivo contra entrega, o QR/transferencia con comprobante y verificación manual del administrador. No se integra una pasarela de pago en línea.
 - La confirmación de compras requiere conexión a internet, porque la transacción de Firestore se ejecuta contra la nube.
 - La validación principal ocurre en la transacción del cliente y en las reglas de seguridad. La ruta con Cloud Functions queda implementada y probada, pero requiere el plan Blaze de Firebase; por eso no está activa en la versión gratuita. Mientras se use Spark, el riesgo residual es que una cuenta con conocimientos técnicos intente manipulaciones; las reglas limitan el daño a pedidos coherentes y movimientos de stock acotados, y la ruta de servidor queda lista para eliminar esa confianza cuando exista presupuesto.
 - El sonido personalizado de las notificaciones del sistema requiere una compilación de desarrollo en Android; en web solo se reproduce el sonido dentro de la aplicación.

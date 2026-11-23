@@ -53,7 +53,7 @@ export default function AdminLayout() {
           title: 'Pedidos',
           tabBarIcon: makeIcon('receipt', 'receipt-outline'),
           tabBarBadge: unread || undefined,
-          tabBarBadgeStyle: { backgroundColor: C.pink, color: '#fff', fontSize: 10, fontWeight: '800' },
+          tabBarBadgeStyle: { backgroundColor: C.pink, color: C.onPink, fontSize: 10, fontWeight: '800' },
         }}
       />
       <Tabs.Screen

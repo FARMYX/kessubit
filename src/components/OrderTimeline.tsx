@@ -81,7 +81,7 @@ export function OrderTimeline({ order }: { order: Order }) {
             borderRadius: radius.md,
             backgroundColor: C.redSoft,
             borderWidth: 1,
-            borderColor: '#F3C9CC',
+            borderColor: C.pinkSoft,
           }}
         >
           <Ionicons name="close-circle" size={22} color={C.red} />

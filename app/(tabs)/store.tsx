@@ -138,7 +138,7 @@ export default function Store() {
                   borderRadius: radius.md,
                   backgroundColor: C.greenSoft,
                   borderWidth: 1,
-                  borderColor: '#BFE6D2',
+                  borderColor: C.greenSoft,
                 }}
               >
                 <Ionicons name="navigate" size={18} color={C.green} />
@@ -232,7 +232,7 @@ export default function Store() {
                 borderRadius: radius.md,
                 backgroundColor: C.pinkWash,
                 borderWidth: 1,
-                borderColor: '#F3D2E1',
+                borderColor: C.pinkSoft,
               }}
             >
               <Ionicons name="megaphone" size={17} color={C.pink} />

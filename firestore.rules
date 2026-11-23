@@ -52,12 +52,12 @@ service cloud.firestore {
         && request.resource.data.phone is string
         && request.resource.data.notes is string
         && request.resource.data.deliveryType in ['delivery', 'pickup']
-        && request.resource.data.paymentMethod in ['efectivo', 'qr', 'transferencia', 'tarjeta']
+        && request.resource.data.paymentMethod in ['efectivo', 'qr', 'transferencia']
         && request.resource.data.paymentStatus in ['no_requiere', 'sin_comprobante']
         && (
           (request.resource.data.paymentMethod in ['qr', 'transferencia']
             && request.resource.data.paymentStatus == 'sin_comprobante')
-          || (request.resource.data.paymentMethod in ['efectivo', 'tarjeta']
+          || (request.resource.data.paymentMethod == 'efectivo'
             && request.resource.data.paymentStatus == 'no_requiere')
         )
         && request.resource.data.items is list

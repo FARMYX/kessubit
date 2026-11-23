@@ -57,6 +57,7 @@ export default function AdminSettings() {
   const [form, setForm] = useState<Form>(toForm(config));
   const [busy, setBusy] = useState(false);
   const [uploadingQr, setUploadingQr] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
   const [error, setError] = useState('');
   const [collectionName, setCollectionName] = useState('');
   const [collectionDescription, setCollectionDescription] = useState('');
@@ -105,6 +106,8 @@ export default function AdminSettings() {
         whatsapp: form.whatsapp.trim(),
         email: form.email.trim(),
         announcement: form.announcement.trim(),
+        heroTitle: (form.heroTitle || '').trim(),
+        heroSubtitle: (form.heroSubtitle || '').trim(),
         paymentHolder: (form.paymentHolder || '').trim(),
         paymentInstructions: (form.paymentInstructions || '').trim(),
         lat,
@@ -328,6 +331,24 @@ export default function AdminSettings() {
     }
   };
 
+  const pickHero = async () => {
+    setError('');
+    setUploadingHero(true);
+    try {
+      const image = await pickImage(1200, false);
+      if (image) {
+        set('heroImage', image);
+        haptic.success();
+        toast.info('Banner cargado', 'Pulsa “Guardar cambios” para publicarlo en el catálogo.');
+      }
+    } catch {
+      haptic.error();
+      setError('No se pudo abrir la galería. Revisa los permisos de fotos.');
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
   const testSound = () => {
     playSound('chime');
     haptic.light();
@@ -353,7 +374,6 @@ export default function AdminSettings() {
     <Screen>
       <ScreenHeader
         title="Ajustes"
-        eyebrow="Tienda"
         subtitle="Estos datos alimentan el catálogo, el checkout, el local y los avisos."
         right={<Btn title="Guardar" compact icon="checkmark" onPress={saveAll} loading={busy} />}
       />
@@ -364,6 +384,77 @@ export default function AdminSettings() {
           <Field label="Nombre" value={form.name} onChangeText={(value) => set('name', value)} />
           <Field label="Dirección" value={form.address} onChangeText={(value) => set('address', value)} />
           <Field label="Horario" value={form.hours} onChangeText={(value) => set('hours', value)} />
+        </Card>
+
+        <Card style={{ gap: space.sm }}>
+          <SectionTitle icon="image-outline" title="Banner del catálogo" />
+          <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
+            Sube una imagen horizontal diseñada fuera de la app o elige una foto de tu galería. El texto
+            va encima con un velo oscuro para que siga siendo legible.
+          </Text>
+          <Field
+            label="Titular (opcional)"
+            value={form.heroTitle || ''}
+            onChangeText={(value) => set('heroTitle', value)}
+            placeholder="Equipa tu banda."
+          />
+          <Field
+            label="Texto de apoyo (opcional)"
+            value={form.heroSubtitle || ''}
+            onChangeText={(value) => set('heroSubtitle', value)}
+            placeholder="Instrumentos elegidos para quienes viven entre riffs y escenarios."
+            containerStyle={{ marginBottom: 0 }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 132,
+              borderRadius: radius.md,
+              backgroundColor: C.surfaceAlt,
+              borderWidth: 1,
+              borderColor: C.border,
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+            }}
+          >
+            {form.heroImage ? (
+              <Image
+                source={{ uri: form.heroImage }}
+                style={{ width: '100%', height: '100%' }}
+                contentFit="cover"
+                accessibilityLabel="Banner del catálogo"
+              />
+            ) : (
+              <View style={{ alignItems: 'center', gap: 6 }}>
+                <Ionicons name="image-outline" size={28} color={C.muted} />
+                <Text style={{ color: C.muted, fontSize: typeScale.caption }}>Sin banner</Text>
+              </View>
+            )}
+          </View>
+          <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
+            <Btn
+              title={form.heroImage ? 'Cambiar banner' : 'Subir banner'}
+              kind="soft"
+              compact
+              icon="image-outline"
+              onPress={pickHero}
+              loading={uploadingHero}
+            />
+            {form.heroImage ? (
+              <Btn
+                title="Quitar banner"
+                kind="ghost"
+                compact
+                icon="trash-outline"
+                onPress={() => {
+                  set('heroImage', '');
+                  haptic.warning();
+                  toast.info('Banner quitado', 'Guarda los cambios para volver al diseño original.');
+                }}
+              />
+            ) : null}
+          </View>
         </Card>
 
         <Card style={{ gap: space.sm }}>
@@ -683,7 +774,7 @@ export default function AdminSettings() {
           <SectionTitle icon="qr-code-outline" title="Pagos y QR" />
           <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
             Sube la foto del QR de tu banca móvil. Si no hay imagen, la opción QR se oculta en el
-            checkout y solo quedan transferencia, efectivo y tarjeta.
+            checkout y solo quedan transferencia y efectivo.
           </Text>
 
           <View
@@ -704,7 +795,7 @@ export default function AdminSettings() {
                 width: 128,
                 height: 128,
                 borderRadius: radius.md,
-                backgroundColor: '#fff',
+                backgroundColor: C.card,
                 borderWidth: 1,
                 borderColor: C.border,
                 alignItems: 'center',
@@ -895,7 +986,7 @@ function Toggle({
         value={value}
         onValueChange={onChange}
         trackColor={{ false: C.borderStrong, true: C.pinkSoft }}
-        thumbColor={value ? C.pink : '#fff'}
+        thumbColor={value ? C.onPink : C.card}
         accessibilityLabel={title}
       />
     </View>

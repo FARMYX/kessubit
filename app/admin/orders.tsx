@@ -6,12 +6,12 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../src/lib/firebase';
 import {
   C,
-  PAYMENT_LABEL,
   PAYMENT_STATUS_COLOR,
   PAYMENT_STATUS_LABEL,
   STATUS_COLOR,
   STATUS_LABEL,
   money,
+  paymentLabel,
   paymentNeedsProof,
   paymentStatusOf,
 } from '../../src/lib/theme';
@@ -206,7 +206,7 @@ export default function AdminOrders() {
               borderRadius: radius.md,
               backgroundColor: pressed ? C.blueSoft : C.surfaceAlt,
               borderWidth: 1,
-              borderColor: '#C9D8FB',
+              borderColor: C.blueSoft,
             },
             { cursor: 'pointer' } as any,
           ]}
@@ -250,7 +250,7 @@ export default function AdminOrders() {
               borderRadius: radius.md,
               backgroundColor: pressed ? C.yellowSoft : C.surfaceAlt,
               borderWidth: 1,
-              borderColor: '#F0D98A',
+              borderColor: C.yellowDeep,
             },
             { cursor: 'pointer' } as any,
           ]}
@@ -385,7 +385,7 @@ export default function AdminOrders() {
                   <Text style={{ color: C.muted, fontSize: typeScale.small }}>
                     {formatDateTime(order.createdAt)} · {order.items?.length || 0} producto(s) ·{' '}
                     {order.deliveryType === 'pickup' ? 'Retiro en tienda' : 'Envío'} ·{' '}
-                    {order.paymentMethod ? PAYMENT_LABEL[order.paymentMethod] : 'Pago por coordinar'}
+                    {order.paymentMethod ? paymentLabel(order.paymentMethod) : 'Pago por coordinar'}
                   </Text>
                   <Text numberOfLines={1} style={{ color: C.muted, fontSize: typeScale.caption }}>
                     {order.address}

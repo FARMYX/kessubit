@@ -9,6 +9,7 @@ import { useAuth } from '../../src/context/AuthContext';
 import { useProducts } from '../../src/context/ProductsContext';
 import { useNotifications } from '../../src/context/NotificationsContext';
 import { useToast } from '../../src/context/ToastContext';
+import { useTheme, type ThemeMode } from '../../src/context/ThemeContext';
 import { useSoundEnabled, playSound } from '../../src/lib/sound';
 import { notify } from '../../src/lib/notify';
 import { haptic } from '../../src/lib/haptics';
@@ -18,6 +19,12 @@ import { Avatar, Badge, Btn, Card, Divider, Empty, Field, ProductCard, Screen, u
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { NotificationBell } from '../../src/components/NotificationBell';
 
+const THEME_MODES: { value: ThemeMode; label: string }[] = [
+  { value: 'light', label: 'Claro' },
+  { value: 'dark', label: 'Oscuro' },
+  { value: 'system', label: 'Sistema' },
+];
+
 export default function Profile() {
   const router = useRouter();
   const { itemW } = useGrid();
@@ -25,6 +32,7 @@ export default function Profile() {
   const { products } = useProducts();
   const { unread, permission, enablePush } = useNotifications();
   const { on: soundOn, toggle: toggleSound } = useSoundEnabled();
+  const { mode: themeMode, setMode: setThemeMode } = useTheme();
   const toast = useToast();
 
   const [editing, setEditing] = useState(false);
@@ -137,7 +145,7 @@ export default function Profile() {
                 borderColor: C.card,
               }}
             >
-              <Ionicons name={busy === 'photo' ? 'hourglass' : 'camera'} size={14} color="#fff" />
+              <Ionicons name={busy === 'photo' ? 'hourglass' : 'camera'} size={14} color={C.onPink} />
             </View>
           </Pressable>
 
@@ -216,6 +224,53 @@ export default function Profile() {
           <Btn title="Cambiar foto de perfil" kind="ghost" compact icon="image-outline" onPress={changePhoto} />
         </Card>
 
+        <Card style={{ gap: space.sm }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+            <Ionicons name="color-palette-outline" size={19} color={C.inkSoft} />
+            <Text style={rowTitle}>Apariencia</Text>
+          </View>
+          <Text style={rowSub}>Elige el tema que te resulte más cómodo para leer.</Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            {THEME_MODES.map((option) => {
+              const selected = themeMode === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => {
+                    setThemeMode(option.value);
+                    haptic.tap();
+                  }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  style={({ pressed }) => [
+                    {
+                      flex: 1,
+                      paddingVertical: 10,
+                      borderRadius: radius.md,
+                      borderWidth: 1,
+                      borderColor: selected ? C.pink : C.border,
+                      backgroundColor: selected ? C.pinkWash : C.card,
+                      alignItems: 'center',
+                      opacity: pressed ? 0.85 : 1,
+                    },
+                    { cursor: 'pointer' } as any,
+                  ]}
+                >
+                  <Text
+                    style={{
+                      color: selected ? C.pink : C.inkSoft,
+                      fontWeight: weight.semibold,
+                      fontSize: typeScale.small,
+                    }}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </Card>
+
         <Card style={{ gap: 0 }}>
           <View style={{ paddingBottom: space.sm }}>
             <NotificationBell showLabel />
@@ -232,7 +287,7 @@ export default function Profile() {
               value={soundOn}
               onValueChange={toggleSound}
               trackColor={{ false: C.borderStrong, true: C.pinkSoft }}
-              thumbColor={soundOn ? C.pink : '#fff'}
+              thumbColor={soundOn ? C.onPink : C.card}
               accessibilityLabel="Sonidos de la app"
             />
           </View>
@@ -321,20 +376,20 @@ const statBox = {
   paddingVertical: space.sm,
   paddingHorizontal: space.md,
   borderRadius: radius.md,
-  backgroundColor: C.surfaceAlt,
+  get backgroundColor() { return C.surfaceAlt; },
   borderWidth: 1,
-  borderColor: C.border,
+  get borderColor() { return C.border; },
   gap: 1,
 };
 
 const statValue = {
-  color: C.ink,
+  get color() { return C.ink; },
   fontWeight: weight.black,
   fontSize: typeScale.h3,
 };
 
 const statLabel = {
-  color: C.muted,
+  get color() { return C.muted; },
   fontSize: typeScale.caption,
   fontWeight: weight.semibold,
 };
@@ -347,13 +402,13 @@ const row = {
 };
 
 const rowTitle = {
-  color: C.ink,
+  get color() { return C.ink; },
   fontWeight: weight.semibold as any,
   fontSize: typeScale.body,
 };
 
 const rowSub = {
-  color: C.muted,
+  get color() { return C.muted; },
   fontSize: typeScale.caption,
   lineHeight: 16,
 };
