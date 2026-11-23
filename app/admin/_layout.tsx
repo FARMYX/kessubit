@@ -1,13 +1,16 @@
 import React from 'react';
 import { type ColorValue } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useGlassTabs } from '../../src/components/Glass';
 import { useNotifications } from '../../src/context/NotificationsContext';
 import { C } from '../../src/lib/theme';
 
-const makeIcon = (active: keyof typeof Ionicons.glyphMap, idle: keyof typeof Ionicons.glyphMap) => {
+const makeIcon = (
+  active: keyof typeof MaterialCommunityIcons.glyphMap,
+  idle: keyof typeof MaterialCommunityIcons.glyphMap,
+) => {
   function TabIcon({
     color,
     size,
@@ -18,7 +21,7 @@ const makeIcon = (active: keyof typeof Ionicons.glyphMap, idle: keyof typeof Ion
     focused: boolean;
   }) {
     return (
-      <Ionicons
+      <MaterialCommunityIcons
         name={focused ? active : idle}
         size={size}
         color={typeof color === 'string' ? color : undefined}
@@ -41,28 +44,28 @@ export default function AdminLayout() {
     <Tabs screenOptions={glass}>
       <Tabs.Screen
         name="index"
-        options={{ title: 'Resumen', tabBarIcon: makeIcon('stats-chart', 'stats-chart-outline') }}
+        options={{ title: 'Resumen', tabBarIcon: makeIcon('equalizer', 'equalizer-outline') }}
       />
       <Tabs.Screen
         name="products"
-        options={{ title: 'Productos', tabBarIcon: makeIcon('pricetags', 'pricetags-outline') }}
+        options={{ title: 'Productos', tabBarIcon: makeIcon('guitar-pick', 'guitar-pick-outline') }}
       />
       <Tabs.Screen
         name="orders"
         options={{
           title: 'Pedidos',
-          tabBarIcon: makeIcon('receipt', 'receipt-outline'),
+          tabBarIcon: makeIcon('truck-delivery', 'truck-delivery-outline'),
           tabBarBadge: unread || undefined,
           tabBarBadgeStyle: { backgroundColor: C.pink, color: C.onPink, fontSize: 10, fontWeight: '800' },
         }}
       />
       <Tabs.Screen
         name="users"
-        options={{ title: 'Usuarios', tabBarIcon: makeIcon('people', 'people-outline') }}
+        options={{ title: 'Usuarios', tabBarIcon: makeIcon('account-group', 'account-group-outline') }}
       />
       <Tabs.Screen
         name="settings"
-        options={{ title: 'Ajustes', tabBarIcon: makeIcon('settings', 'settings-outline') }}
+        options={{ title: 'Ajustes', tabBarIcon: makeIcon('tune', 'tune-variant') }}
       />
     </Tabs>
   );

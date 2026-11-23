@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../src/lib/firebase';
 import {
@@ -413,10 +413,10 @@ export default function Dashboard() {
 
           <Card style={{ gap: space.sm }}>
             <Text style={{ color: C.ink, fontWeight: weight.black, fontSize: typeScale.title }}>Accesos</Text>
-            <Shortcut icon="pricetags-outline" label="Productos" hint={`${products.length} en catálogo`} onPress={() => router.push('/admin/products')} />
-            <Shortcut icon="receipt-outline" label="Pedidos" hint={`${stats.totalOrders} en total`} onPress={() => router.push('/admin/orders')} />
-            <Shortcut icon="people-outline" label="Usuarios" hint={`${users.length} registrados`} onPress={() => router.push('/admin/users')} />
-            <Shortcut icon="settings-outline" label="Ajustes de la tienda" hint="Envío, contacto, QR y avisos" onPress={() => router.push('/admin/settings')} />
+            <Shortcut icon="guitar-pick-outline" label="Productos" hint={`${products.length} en catálogo`} onPress={() => router.push('/admin/products')} />
+            <Shortcut icon="truck-delivery-outline" label="Pedidos" hint={`${stats.totalOrders} en total`} onPress={() => router.push('/admin/orders')} />
+            <Shortcut icon="account-group-outline" label="Usuarios" hint={`${users.length} registrados`} onPress={() => router.push('/admin/users')} />
+            <Shortcut icon="tune-variant" label="Ajustes de la tienda" hint="Envío, contacto, QR y avisos" onPress={() => router.push('/admin/settings')} />
           </Card>
 
           {unread > 0 ? (
@@ -599,7 +599,7 @@ function Shortcut({
   hint,
   onPress,
 }: {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
   label: string;
   hint: string;
   onPress: () => void;
@@ -622,7 +622,7 @@ function Shortcut({
         { cursor: 'pointer' } as any,
       ]}
     >
-      <Ionicons name={icon} size={18} color={C.inkSoft} />
+      <MaterialCommunityIcons name={icon} size={18} color={C.inkSoft} />
       <View style={{ flex: 1 }}>
         <Text style={{ color: C.ink, fontWeight: weight.semibold, fontSize: typeScale.small }}>{label}</Text>
         <Text style={{ color: C.muted, fontSize: typeScale.caption }}>{hint}</Text>
