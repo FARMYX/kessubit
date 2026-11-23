@@ -192,6 +192,12 @@ export type StoreConfig = {
   paymentHolder?: string;
   /** Instrucciones extra para pagar por QR o transferencia. */
   paymentInstructions?: string;
+  /** Banco publicado para recibir transferencias. */
+  bankName?: string;
+  /** Número de cuenta publicado para recibir transferencias. */
+  bankAccountNumber?: string;
+  /** CI/NIT del titular, si la tienda decide publicarlo. */
+  bankDocument?: string;
 };
 
 export type CheckoutInput = {

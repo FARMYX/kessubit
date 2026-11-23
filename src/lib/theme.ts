@@ -234,6 +234,9 @@ export const STORE: StoreConfig = {
   heroSubtitle: '',
   paymentHolder: '',
   paymentInstructions: '',
+  bankName: '',
+  bankAccountNumber: '',
+  bankDocument: '',
 };
 
 /** Aplica la paleta activa; los mapas derivados leen `C` mediante getters. */

@@ -22,7 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { C, money } from '../lib/theme';
 import { fandomMeta, useFandoms } from '../lib/fandoms';
-import { radius, shadow, space, spring, tracking, type as typeScale, weight } from '../lib/design';
+import { layout, radius, shadow, space, spring, tracking, type as typeScale, weight } from '../lib/design';
 import { useBottomPadding, useResponsive } from '../lib/responsive';
 import { initials } from '../lib/format';
 import { stockColor, stockShortLabel, stockSoftColor, stockState } from '../lib/stock';
@@ -182,7 +182,7 @@ export function Btn({
       accessibilityLabel={title}
       style={[
         {
-          minHeight: compact ? 38 : 46,
+          minHeight: compact ? layout.touchTarget : 46,
           paddingHorizontal: compact ? space.md : space.lg,
           paddingVertical: compact ? space.sm : space.md,
           borderRadius: radius.md,
@@ -296,8 +296,9 @@ export function Chip({
           flexDirection: 'row',
           alignItems: 'center',
           gap: 5,
-          paddingHorizontal: 13,
-          paddingVertical: 8,
+          minHeight: layout.touchTarget,
+          paddingHorizontal: 14,
+          paddingVertical: 10,
           borderRadius: radius.pill,
           marginRight: space.sm,
           marginBottom: 6,
@@ -642,11 +643,11 @@ export function ProductCard({
             accessibilityLabel={favorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
             style={{
               position: 'absolute',
-              top: 7,
-              right: 7,
-              width: 32,
-              height: 32,
-              borderRadius: 16,
+              top: 8,
+              right: 8,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
               backgroundColor: C.card,
               alignItems: 'center',
               justifyContent: 'center',
@@ -668,11 +669,11 @@ export function ProductCard({
             accessibilityState={{ disabled: soldOut }}
             style={{
               position: 'absolute',
-              right: space.md,
-              bottom: space.md,
-              width: 34,
-              height: 34,
-              borderRadius: 17,
+              right: 8,
+              bottom: 8,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
               backgroundColor: soldOut ? C.bgAlt : C.pink,
               alignItems: 'center',
               justifyContent: 'center',

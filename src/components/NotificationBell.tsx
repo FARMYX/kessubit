@@ -4,9 +4,9 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useNotifications } from '../context/NotificationsContext';
 import { C } from '../lib/theme';
-import { radius, weight } from '../lib/design';
+import { layout, radius, weight } from '../lib/design';
 
-export function NotificationBell({ size = 42, showLabel = false }: { size?: number; showLabel?: boolean }) {
+export function NotificationBell({ size = layout.touchTarget, showLabel = false }: { size?: number; showLabel?: boolean }) {
   const { unread } = useNotifications();
   const router = useRouter();
 
@@ -24,6 +24,7 @@ export function NotificationBell({ size = 42, showLabel = false }: { size?: numb
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10,
+            minHeight: layout.touchTarget,
             paddingVertical: 10,
             paddingHorizontal: 12,
             borderRadius: radius.md,

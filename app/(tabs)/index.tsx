@@ -236,85 +236,126 @@ export default function Catalog() {
             />
           </>
         ) : null}
-        <View style={{ flexDirection: 'row', gap: space.xl, alignItems: 'center' }}>
-          <View style={{ flex: 1, gap: space.md }}>
-            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-              <View style={fandomTag(C.pink)}>
-                <Text style={fandomText(C.pink)}>HECHO PARA SONAR</Text>
+        <View
+          style={{
+            flexDirection: isDesktop ? 'row' : 'column',
+            gap: isDesktop ? space['2xl'] : space.lg,
+            alignItems: 'stretch',
+          }}
+        >
+          <View style={{ flex: isDesktop ? 1.35 : undefined, gap: space.md }}>
+            <View style={{ flexDirection: 'row', alignItems: 'stretch', gap: space.md }}>
+              <View
+                style={{
+                  width: 3,
+                  alignSelf: 'stretch',
+                  borderRadius: 2,
+                  backgroundColor: hasHeroImage ? 'rgba(255,248,243,0.9)' : C.pink,
+                }}
+              />
+              <View style={{ flex: 1, gap: space.md }}>
+                <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+                  <View style={fandomTag(C.pink)}>
+                    <Text style={fandomText(C.pink)}>HECHO PARA SONAR</Text>
+                  </View>
+                  <View style={fandomTag(C.blue)}>
+                    <Text style={fandomText(C.blue)}>ORURO, BOLIVIA</Text>
+                  </View>
+                </View>
+                <Text
+                  style={{
+                    color: heroInk,
+                    fontSize: isDesktop ? 38 : 28,
+                    lineHeight: (isDesktop ? 38 : 28) * 1.1,
+                    fontWeight: weight.black,
+                    letterSpacing: tracking.tight,
+                    maxWidth: 520,
+                  }}
+                >
+                  {config.heroTitle || "Equipa tu banda.\nSuena como tú."}
+                </Text>
+                <Text
+                  style={{
+                    color: heroInkSoft,
+                    fontSize: isDesktop ? 15 : 13.5,
+                    lineHeight: 21,
+                    maxWidth: 460,
+                  }}
+                >
+                  {config.heroSubtitle ||
+                    'Guitarras, bajos, baterías y accesorios elegidos para quienes viven entre riffs y escenarios.'}
+                </Text>
+                <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', marginTop: 2 }}>
+                  <Pressable
+                    onPress={() => setCat('Guitarras')}
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      {
+                        backgroundColor: C.pink,
+                        borderRadius: radius.md,
+                        minHeight: layout.touchTarget,
+                        paddingHorizontal: space.lg,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 7,
+                        opacity: pressed ? 0.9 : 1,
+                      },
+                      { cursor: 'pointer' } as any,
+                    ]}
+                  >
+                    <Ionicons name="git-branch" size={16} color={C.onPink} />
+                    <Text style={{ color: C.onPink, fontWeight: weight.bold, fontSize: typeScale.body }}>
+                      Ver guitarras
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setCat('Accesorios')}
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      {
+                        backgroundColor: C.card,
+                        borderRadius: radius.md,
+                        borderWidth: 1,
+                        borderColor: hasHeroImage ? 'rgba(255,248,243,0.55)' : C.borderStrong,
+                        minHeight: layout.touchTarget,
+                        paddingHorizontal: space.lg,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: pressed ? 0.9 : 1,
+                      },
+                      { cursor: 'pointer' } as any,
+                    ]}
+                  >
+                    <Text style={{ color: C.ink, fontWeight: weight.bold, fontSize: typeScale.body }}>
+                      Accesorios
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
-              <View style={fandomTag(C.blue)}>
-                <Text style={fandomText(C.blue)}>ORURO, BOLIVIA</Text>
-              </View>
-            </View>
-            <Text
-              style={{
-                color: heroInk,
-                fontSize: isDesktop ? 38 : 28,
-                lineHeight: (isDesktop ? 38 : 28) * 1.1,
-                fontWeight: weight.black,
-                letterSpacing: tracking.tight,
-                maxWidth: 520,
-              }}
-            >
-              {config.heroTitle || "Equipa tu banda.\nSuena como tú."}
-            </Text>
-            <Text style={{ color: heroInkSoft, fontSize: isDesktop ? 15 : 13.5, lineHeight: 21, maxWidth: 460 }}>
-              {config.heroSubtitle ||
-                'Guitarras, bajos, baterías y accesorios elegidos para quienes viven entre riffs y escenarios.'}
-            </Text>
-            <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap', marginTop: 2 }}>
-              <Pressable
-                onPress={() => setCat('Guitarras')}
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: C.pink,
-                    borderRadius: radius.md,
-                    paddingHorizontal: space.lg,
-                    paddingVertical: 11,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 7,
-                    opacity: pressed ? 0.9 : 1,
-                  },
-                  { cursor: 'pointer' } as any,
-                ]}
-              >
-                <Ionicons name="git-branch" size={16} color={C.onPink} />
-                <Text style={{ color: C.onPink, fontWeight: weight.bold, fontSize: typeScale.body }}>Ver guitarras</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setCat('Accesorios')}
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: C.card,
-                    borderRadius: radius.md,
-                    borderWidth: 1,
-                    borderColor: C.borderStrong,
-                    paddingHorizontal: space.lg,
-                    paddingVertical: 11,
-                    opacity: pressed ? 0.9 : 1,
-                  },
-                  { cursor: 'pointer' } as any,
-                ]}
-              >
-                <Text style={{ color: C.ink, fontWeight: weight.bold, fontSize: typeScale.body }}>Accesorios</Text>
-              </Pressable>
             </View>
           </View>
 
           {isDesktop ? (
-            <View style={{ width: 220, height: 190, justifyContent: 'center' }}>
-              <View style={[sticker, { top: 6, left: 10, transform: [{ rotate: '-7deg' }], backgroundColor: C.card }]}>
+            <View
+              style={{
+                width: 232,
+                minHeight: 224,
+                alignSelf: 'flex-end',
+                marginTop: space['2xl'],
+              }}
+            >
+              <View style={[sticker, { top: 0, left: 0, transform: [{ rotate: '-8deg' }], backgroundColor: C.card }]}>
                 <Ionicons name="musical-note" size={16} color={C.pink} />
                 <Text style={stickerTitle}>Riff diario</Text>
                 <Text style={stickerSub}>Toca algo hoy</Text>
               </View>
-              <View style={[sticker, { top: 66, right: 4, transform: [{ rotate: '5deg' }], backgroundColor: C.yellowSoft }]}>
+              <View style={[sticker, { top: 62, right: 6, transform: [{ rotate: '6deg' }], backgroundColor: C.yellowSoft }]}>
                 <Ionicons name="sparkles" size={16} color={C.yellowDeep} />
                 <Text style={stickerTitle}>Edición banda</Text>
                 <Text style={stickerSub}>Tu banda, tu sonido</Text>
               </View>
-              <View style={[sticker, { bottom: 0, left: 28, transform: [{ rotate: '-2deg' }], backgroundColor: C.card }]}>
+              <View style={[sticker, { bottom: 0, left: 40, transform: [{ rotate: '-3deg' }], backgroundColor: C.card }]}>
                 <Ionicons name="bicycle" size={16} color={C.green} />
                 <Text style={stickerTitle}>Envío gratis</Text>
                 <Text style={stickerSub}>Desde Bs {config.freeShippingThreshold}</Text>
@@ -388,7 +429,7 @@ export default function Catalog() {
                   />
                   <Text
                     numberOfLines={1}
-                    style={{ color: C.pink, fontSize: typeScale.caption, fontWeight: weight.bold, marginTop: -4 }}
+                    style={{ color: C.pink, fontSize: typeScale.caption, fontWeight: weight.bold, marginTop: space.xs }}
                   >
                     {offer.note}
                   </Text>
@@ -469,7 +510,7 @@ export default function Catalog() {
                     favorite={!!profile?.favorites?.includes(rec.product.id)}
                     onToggleFavorite={() => toggleFavorite(rec.product)}
                   />
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: -4 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: space.xs }}>
                     <Ionicons name="sparkles" size={11} color={C.pink} />
                     <Text
                       numberOfLines={1}

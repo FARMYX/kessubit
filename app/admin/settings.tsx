@@ -110,6 +110,9 @@ export default function AdminSettings() {
         heroSubtitle: (form.heroSubtitle || '').trim(),
         paymentHolder: (form.paymentHolder || '').trim(),
         paymentInstructions: (form.paymentInstructions || '').trim(),
+        bankName: (form.bankName || '').trim(),
+        bankAccountNumber: (form.bankAccountNumber || '').trim(),
+        bankDocument: (form.bankDocument || '').trim(),
         lat,
         lng,
         shippingCost,
@@ -869,6 +872,33 @@ export default function AdminSettings() {
             onChangeText={(value) => set('paymentInstructions', value)}
             multiline
             placeholder="Ej. Escanea el QR desde tu banca móvil y guarda la captura."
+            containerStyle={{ marginBottom: 0 }}
+          />
+        </Card>
+
+        <Card style={{ gap: space.sm }}>
+          <SectionTitle icon="swap-horizontal-outline" title="Datos para transferencia" />
+          <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
+            Publica la cuenta en el checkout. El cliente verá estos datos y podrá copiarlos antes de
+            subir su comprobante.
+          </Text>
+          <Field
+            label="Banco o entidad"
+            value={form.bankName || ''}
+            onChangeText={(value) => set('bankName', value)}
+            placeholder="Ej. Banco Fiesta"
+          />
+          <Field
+            label="Número de cuenta"
+            value={form.bankAccountNumber || ''}
+            onChangeText={(value) => set('bankAccountNumber', value)}
+            placeholder="Número de cuenta o CBU"
+          />
+          <Field
+            label="CI/NIT del titular (opcional)"
+            value={form.bankDocument || ''}
+            onChangeText={(value) => set('bankDocument', value)}
+            placeholder="Solo si quieres mostrarlo"
             containerStyle={{ marginBottom: 0 }}
           />
         </Card>

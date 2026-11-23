@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
+import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import {
   C,
@@ -20,6 +21,7 @@ import { useAuth } from '../src/context/AuthContext';
 import { useStoreConfig } from '../src/context/StoreConfigContext';
 import { useToast } from '../src/context/ToastContext';
 import { createOrder, newIdempotencyKey } from '../src/lib/orders';
+import { bankDetailsLines, bankDetailsText } from '../src/lib/paymentDetails';
 import { playSound } from '../src/lib/sound';
 import { haptic } from '../src/lib/haptics';
 import { Btn, Card, Chip, Divider, Empty, Field, Screen } from '../src/components/UI';
@@ -85,6 +87,22 @@ export default function Checkout() {
     () => PAYMENT_METHOD_ORDER.filter((method) => method !== 'qr' || !!config.qrImage),
     [config.qrImage]
   );
+
+  const bankLines = useMemo(() => bankDetailsLines(config), [config]);
+
+  const copyBankDetails = async () => {
+    try {
+      const saved = await Clipboard.setStringAsync(bankDetailsText(config), {
+        android: { isSensitive: true },
+      });
+      if (!saved) throw new Error('clipboard');
+      haptic.tap();
+      toast.success('Datos copiados', 'Pégalos en tu banca móvil.');
+    } catch {
+      haptic.error();
+      toast.error('No se pudieron copiar', 'Selecciona los datos y cópialos manualmente.');
+    }
+  };
 
   const shipping = useMemo(() => {
     if (deliveryType === 'pickup' || !config.deliveryEnabled) return 0;
@@ -389,8 +407,25 @@ export default function Checkout() {
                   ) : null}
                   <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
                     {config.paymentInstructions ||
-                      'Usa los datos de la tienda y guarda la captura de la transferencia.'}
+                      'La tienda te coordina los datos bancarios. Guarda la captura de la transferencia.'}
                   </Text>
+                  {bankLines.length ? (
+                    <View style={bankDetailsBox}>
+                      {bankLines.map((line) => (
+                        <Text key={line} style={{ color: C.inkSoft, fontSize: typeScale.small }}>
+                          {line}
+                        </Text>
+                      ))}
+                      <Btn
+                        title="Copiar datos"
+                        kind="soft"
+                        compact
+                        icon="copy-outline"
+                        onPress={copyBankDetails}
+                        style={{ alignSelf: 'flex-start', marginTop: space.xs }}
+                      />
+                    </View>
+                  ) : null}
                 </View>
               </View>
             ) : (
@@ -618,6 +653,16 @@ const transferPanel = {
   get backgroundColor() { return C.blueSoft; },
   borderWidth: 1,
   get borderColor() { return C.blue; },
+};
+
+const bankDetailsBox = {
+  gap: 3,
+  marginTop: space.sm,
+  padding: space.md,
+  borderRadius: radius.sm,
+  get backgroundColor() { return C.card; },
+  borderWidth: 1,
+  get borderColor() { return C.border; },
 };
 
 const cashNote = {
