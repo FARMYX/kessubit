@@ -274,7 +274,7 @@ export default function Dashboard() {
             recent.map((order) => (
               <Pressable
                 key={order.id}
-                onPress={() => router.push(`/order/${order.id}` as any)}
+                onPress={() => router.push(`/order/${order.id}?from=admin` as any)}
                 accessibilityRole="button"
                 style={({ pressed }) => [
                   {

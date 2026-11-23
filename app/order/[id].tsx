@@ -45,7 +45,7 @@ import { ReceiptSheet } from '../../src/components/ReceiptSheet';
 import type { Order, OrderStatus, PaymentProof } from '../../src/lib/types';
 
 export default function OrderDetail() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const { isDesktop } = useResponsive();
   const { user, isAdmin } = useAuth();
@@ -66,6 +66,7 @@ export default function OrderDetail() {
   const [proofFullscreen, setProofFullscreen] = useState(false);
 
   const loading = !!id && loadedId !== id;
+  const openedFromAdmin = from === 'admin';
 
   useEffect(() => {
     if (!id) return;
@@ -501,7 +502,9 @@ export default function OrderDetail() {
           </Card>
 
           <View style={{ flexDirection: 'row', gap: space.sm, flexWrap: 'wrap' }}>
-            <Btn title="Volver a pedir" kind="soft" icon="refresh" onPress={reorder} loading={busy === 'reorder'} />
+            {!openedFromAdmin ? (
+              <Btn title="Volver a pedir" kind="soft" icon="refresh" onPress={reorder} loading={busy === 'reorder'} />
+            ) : null}
             <Btn
               title="Ver recibo"
               kind="ghost"

@@ -367,7 +367,7 @@ export default function AdminOrders() {
                 }}
               >
                 <Pressable
-                  onPress={() => router.push(`/order/${order.id}` as any)}
+                  onPress={() => router.push(`/order/${order.id}?from=admin` as any)}
                   accessibilityRole="button"
                   accessibilityLabel={`Pedido ${orderCode(order)}, ${STATUS_LABEL[order.status]}`}
                   style={({ pressed }) => [
