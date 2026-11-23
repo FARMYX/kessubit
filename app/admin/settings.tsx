@@ -30,6 +30,7 @@ import {
 import { SEED_OFFERS, seedOfferPrices } from '../../src/lib/seed';
 import { Btn, Card, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { BackToStore } from '../../src/components/BackToStore';
 import type { Collection, FandomTag, StoreConfig } from '../../src/lib/types';
 
 type Form = Omit<StoreConfig, 'lat' | 'lng' | 'shippingCost' | 'freeShippingThreshold'> & {
@@ -378,7 +379,12 @@ export default function AdminSettings() {
       <ScreenHeader
         title="Ajustes"
         subtitle="Estos datos alimentan el catálogo, el checkout, el local y los avisos."
-        right={<Btn title="Guardar" compact icon="checkmark" onPress={saveAll} loading={busy} />}
+        right={
+          <>
+            <BackToStore />
+            <Btn title="Guardar" compact icon="checkmark" onPress={saveAll} loading={busy} />
+          </>
+        }
       />
 
       <View style={{ gap: space.md }}>

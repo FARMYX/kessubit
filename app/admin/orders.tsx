@@ -20,6 +20,7 @@ import { formatDateTime, orderCode } from '../../src/lib/format';
 import { Badge, Btn, Chip, Empty, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { NotificationBell } from '../../src/components/NotificationBell';
+import { BackToStore } from '../../src/components/BackToStore';
 import { Skeleton } from '../../src/components/Skeleton';
 import { useToast } from '../../src/context/ToastContext';
 import { verifyPayment } from '../../src/lib/orders';
@@ -181,7 +182,12 @@ export default function AdminOrders() {
         title="Pedidos"
         eyebrow={orders.length ? `${orders.length} en total` : undefined}
         subtitle="Abre un pedido para cambiar su estado y avisar al cliente."
-        right={<NotificationBell />}
+        right={
+          <>
+            <BackToStore />
+            <NotificationBell />
+          </>
+        }
       />
 
       <Field

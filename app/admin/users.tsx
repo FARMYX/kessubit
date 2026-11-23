@@ -12,6 +12,7 @@ import { confirmAction } from '../../src/lib/confirm';
 import { haptic } from '../../src/lib/haptics';
 import { Avatar, Badge, Btn, Card, Empty, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { BackToStore } from '../../src/components/BackToStore';
 import { Skeleton } from '../../src/components/Skeleton';
 import type { Profile } from '../../src/lib/types';
 
@@ -78,6 +79,7 @@ export default function AdminUsers() {
         title="Usuarios"
         eyebrow={`${users.length} registrados · ${admins} admin${admins === 1 ? '' : 's'}`}
         subtitle="Gestiona quién puede administrar la tienda."
+        right={<BackToStore />}
       />
 
       <Field

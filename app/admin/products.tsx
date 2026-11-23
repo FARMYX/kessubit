@@ -24,6 +24,7 @@ import { useCollections } from '../../src/lib/collections';
 import { fandomMeta, useFandoms } from '../../src/lib/fandoms';
 import { Badge, Btn, Card, Chip, Empty, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { BackToStore } from '../../src/components/BackToStore';
 import { ProductImage } from '../../src/components/ProductImage';
 import { Skeleton } from '../../src/components/Skeleton';
 import type { Product } from '../../src/lib/types';
@@ -449,7 +450,12 @@ export default function AdminProducts() {
         title="Productos"
         eyebrow={`${products.length} en catálogo`}
         subtitle="Crea, edita y controla el stock de cada instrumento."
-        right={<Btn title="Añadir" compact icon="add" onPress={startNew} />}
+        right={
+          <>
+            <BackToStore />
+            <Btn title="Añadir" compact icon="add" onPress={startNew} />
+          </>
+        }
       />
 
       <View style={{ flexDirection: 'row', gap: space.sm, marginBottom: space.sm, flexWrap: 'wrap' }}>

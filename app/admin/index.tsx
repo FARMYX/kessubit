@@ -31,6 +31,7 @@ import { useStoreConfig } from '../../src/context/StoreConfigContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Badge, Card, Empty, Screen } from '../../src/components/UI';
 import { NotificationBell } from '../../src/components/NotificationBell';
+import { BackToStore } from '../../src/components/BackToStore';
 import { Skeleton } from '../../src/components/Skeleton';
 import type { Order, Product } from '../../src/lib/types';
 
@@ -174,7 +175,10 @@ export default function Dashboard() {
               {dateLabel()} · {config.name} · datos en tiempo real
             </Text>
           </View>
-          <NotificationBell />
+          <View style={{ gap: space.sm, alignItems: 'flex-end' }}>
+            <NotificationBell />
+            <BackToStore />
+          </View>
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.lg }}>

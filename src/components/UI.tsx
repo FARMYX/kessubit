@@ -155,6 +155,7 @@ export function Btn({
   icon,
   loading,
   compact,
+  accessibilityLabel,
 }: {
   title: string;
   onPress: () => void;
@@ -164,6 +165,7 @@ export function Btn({
   icon?: keyof typeof Ionicons.glyphMap;
   loading?: boolean;
   compact?: boolean;
+  accessibilityLabel?: string;
 }) {
   const tones: Record<BtnKind, { bg: string; border: string; text: string }> = {
     primary: { bg: C.pink, border: C.pink, text: C.onPink },
@@ -179,7 +181,7 @@ export function Btn({
     <Pressy
       onPress={onPress}
       disabled={inactive}
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel || title}
       style={[
         {
           minHeight: compact ? layout.touchTarget : 46,
