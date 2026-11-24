@@ -178,7 +178,8 @@ function measure(pcm) {
 
 const SOUNDS = {
   // Neutro: acorde abierto G-D, campana cálida y breve.
-  'kessoku-chime.wav': render(0.72, [
+  // Android solo acepta a-z, 0-9 y guion bajo en nombres de recursos.
+  'kessoku_chime.wav': render(0.72, [
     pluck(G4, { duration: 0.68, gain: 0.9, decay: 0.24, seed: 11 }),
     pluck(D5, { start: 0.1, duration: 0.52, gain: 0.34, decay: 0.19, seed: 12 }),
   ]),

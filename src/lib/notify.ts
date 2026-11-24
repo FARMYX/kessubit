@@ -10,7 +10,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 export const NOTIFICATION_CHANNEL_ID = 'kessoku-orders-v1';
-export const NOTIFICATION_SOUND = 'kessoku-chime.wav';
+export const NOTIFICATION_SOUND = 'kessoku_chime.wav';
 
 const isWeb = Platform.OS === 'web';
 

@@ -6,7 +6,7 @@ export type SoundName = 'chime' | 'pop' | 'success' | 'verify' | 'offer' | 'rece
 
 // Original short sounds generated for the KESUUBIT theme.
 const SOURCES: Record<SoundName, number> = {
-  chime: require('../../assets/sounds/kessoku-chime.wav'),
+  chime: require('../../assets/sounds/kessoku_chime.wav'),
   pop: require('../../assets/sounds/kessoku-pop.wav'),
   success: require('../../assets/sounds/kessoku-success.wav'),
   verify: require('../../assets/sounds/kessoku-verify.wav'),
