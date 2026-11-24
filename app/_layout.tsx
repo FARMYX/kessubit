@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ToastProvider } from '../src/context/ToastContext';
 import { AuthProvider } from '../src/context/AuthContext';
@@ -10,7 +10,25 @@ import { CartProvider } from '../src/context/CartContext';
 import { RecommendationsProvider } from '../src/context/RecommendationsContext';
 import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 import { WebStyles } from '../src/components/WebStyles';
+import { AppErrorBoundary } from '../src/components/AppErrorBoundary';
+import { FatalErrorScreen } from '../src/components/FatalErrorScreen';
+import { getStartupIssues } from '../src/lib/startupErrors';
 import { C } from '../src/lib/theme';
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <FatalErrorScreen
+      error={error}
+      retry={() => {
+        void retry();
+      }}
+    />
+  );
+}
+
+export const unstable_settings = {
+  screenErrorBoundary: ErrorBoundary,
+};
 
 function AppStack() {
   const { scheme, revision } = useTheme();
@@ -36,23 +54,28 @@ function AppStack() {
 }
 
 export default function Root() {
+  const startupIssues = getStartupIssues();
+  if (startupIssues.length > 0) return <FatalErrorScreen issues={startupIssues} />;
+
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <ProductsProvider>
-            <StoreConfigProvider>
-              <NotificationsProvider>
-                <CartProvider>
-                  <RecommendationsProvider>
-                    <AppStack />
-                  </RecommendationsProvider>
-                </CartProvider>
-              </NotificationsProvider>
-            </StoreConfigProvider>
-          </ProductsProvider>
-        </AuthProvider>
-      </ToastProvider>
-    </ThemeProvider>
+    <AppErrorBoundary>
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <ProductsProvider>
+              <StoreConfigProvider>
+                <NotificationsProvider>
+                  <CartProvider>
+                    <RecommendationsProvider>
+                      <AppStack />
+                    </RecommendationsProvider>
+                  </CartProvider>
+                </NotificationsProvider>
+              </StoreConfigProvider>
+            </ProductsProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </AppErrorBoundary>
   );
 }

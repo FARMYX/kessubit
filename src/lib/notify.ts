@@ -8,6 +8,7 @@ import {
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { reportStartupIssue } from './startupErrors';
 
 export const NOTIFICATION_CHANNEL_ID = 'kessoku-orders-v1';
 export const NOTIFICATION_SOUND = 'kessoku_chime.wav';
@@ -15,14 +16,18 @@ export const NOTIFICATION_SOUND = 'kessoku_chime.wav';
 const isWeb = Platform.OS === 'web';
 
 if (!isWeb) {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  } catch (error) {
+    reportStartupIssue('inicialización de notificaciones', error);
+  }
 }
 
 let channelReady = false;
@@ -167,9 +172,14 @@ export async function registerPushToken(): Promise<string | null> {
 /** Opens the right screen when the user taps a notification. */
 export function subscribeToNotificationTaps(onOpen: (url: string) => void) {
   if (isWeb) return () => {};
-  const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-    const url = response.notification.request.content.data?.url;
-    if (typeof url === 'string') onOpen(url);
-  });
-  return () => sub.remove();
+  try {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const url = response.notification.request.content.data?.url;
+      if (typeof url === 'string') onOpen(url);
+    });
+    return () => sub.remove();
+  } catch (error) {
+    reportStartupIssue('listener de notificaciones', error);
+    return () => {};
+  }
 }
