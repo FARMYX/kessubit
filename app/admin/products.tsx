@@ -6,7 +6,6 @@ import { db } from '../../src/lib/firebase';
 import { C, CATEGORIES, money } from '../../src/lib/theme';
 import { radius, space, type as typeScale, weight } from '../../src/lib/design';
 import { pickImage } from '../../src/lib/image';
-import { seedProducts } from '../../src/lib/seed';
 import { confirmAction } from '../../src/lib/confirm';
 import {
   restockProducts,
@@ -81,7 +80,7 @@ export default function AdminProducts() {
   const [form, setForm] = useState<Form | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [busy, setBusy] = useState<'save' | 'seed' | null>(null);
+  const [busy, setBusy] = useState<'save' | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todas');
   const [stockFilter, setStockFilter] = useState<StockFilter>('todos');
@@ -208,19 +207,6 @@ export default function AdminProducts() {
         toast.error('No se pudo borrar', 'Revisa tu conexión y permisos.');
       }
     }, 'Borrar');
-  };
-
-  const seed = async () => {
-    setBusy('seed');
-    setError('');
-    try {
-      await seedProducts();
-      toast.success('Catálogo demo actualizado', 'Solo se añadieron los productos que faltaban.');
-    } catch {
-      setError('No se pudo cargar el catálogo demo. ¿Tu usuario es admin y las reglas están publicadas?');
-    } finally {
-      setBusy(null);
-    }
   };
 
   if (form) {
@@ -465,14 +451,6 @@ export default function AdminProducts() {
           onChangeText={setSearch}
           containerStyle={{ flex: 1, minWidth: 200, marginBottom: 0 }}
         />
-        <Btn
-          title={busy === 'seed' ? 'Cargando…' : 'Demo'}
-          kind="ghost"
-          compact
-          icon="cloud-download-outline"
-          onPress={seed}
-          loading={busy === 'seed'}
-        />
       </View>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: space.sm }}>
@@ -581,7 +559,7 @@ export default function AdminProducts() {
         <Empty
           icon="pricetags-outline"
           title="Sin productos aquí"
-          text={products.length ? 'Prueba con otra búsqueda o categoría.' : 'Añade tu primer producto o carga el catálogo demo.'}
+          text={products.length ? 'Prueba con otra búsqueda o categoría.' : 'Añade tu primer producto con el botón “Añadir”.'}
           action={{ label: 'Añadir producto', onPress: startNew }}
         />
       ) : (

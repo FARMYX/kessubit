@@ -60,6 +60,10 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
+        name="offers"
+        options={{ title: 'Ofertas', tabBarIcon: makeIcon('sale', 'sale-outline') }}
+      />
+      <Tabs.Screen
         name="users"
         options={{ title: 'Usuarios', tabBarIcon: makeIcon('account-group', 'account-group-outline') }}
       />

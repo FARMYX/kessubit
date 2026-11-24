@@ -54,6 +54,15 @@ service cloud.firestore {
         && request.resource.data.deliveryType in ['delivery', 'pickup']
         && request.resource.data.paymentMethod in ['efectivo', 'qr', 'transferencia']
         && request.resource.data.paymentStatus in ['no_requiere', 'sin_comprobante']
+        && (!('bundleId' in request.resource.data)
+          || (request.resource.data.bundleId is string
+            && request.resource.data.bundleId.size() <= 128
+            && (!('bundleOfferPrice' in request.resource.data)
+              || (request.resource.data.bundleOfferPrice is number
+                && request.resource.data.bundleOfferPrice > 0))
+            && (!('bundleOriginalPrice' in request.resource.data)
+              || (request.resource.data.bundleOriginalPrice is number
+                && request.resource.data.bundleOriginalPrice >= 0))))
         && (
           (request.resource.data.paymentMethod in ['qr', 'transferencia']
             && request.resource.data.paymentStatus == 'sin_comprobante')
@@ -214,6 +223,26 @@ service cloud.firestore {
     match /fandoms/{id} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // Ofertas/combos creados por administración. Lectura pública, escritura solo admin.
+    match /offerBundles/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.productIds is list
+        && request.resource.data.productIds.size() >= 2
+        && request.resource.data.productIds.size() <= 8
+        && request.resource.data.offerPrice is number
+        && request.resource.data.offerPrice > 0
+        && request.resource.data.offerPrice <= 1000000
+        && (!('originalPrice' in request.resource.data)
+          || (request.resource.data.originalPrice is number
+            && request.resource.data.originalPrice >= 0))
+        && request.resource.data.active is bool;
+      allow delete: if isAdmin();
     }
 
     // Contador de números de pedido. La transacción solo puede subirlo de uno

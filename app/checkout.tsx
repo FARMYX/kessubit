@@ -59,7 +59,7 @@ function friendlyCheckoutError(e: any) {
 export default function Checkout() {
   const router = useRouter();
   const { isDesktop } = useResponsive();
-  const { lines, subtotal, clear } = useCart();
+  const { lines, subtotal, discount, total: cartTotal, activeBundle, clear } = useCart();
   const { user, profile } = useAuth();
   const { config } = useStoreConfig();
   const toast = useToast();
@@ -106,11 +106,11 @@ export default function Checkout() {
 
   const shipping = useMemo(() => {
     if (deliveryType === 'pickup' || !config.deliveryEnabled) return 0;
-    if (subtotal >= Number(config.freeShippingThreshold || 0)) return 0;
+    if (cartTotal >= Number(config.freeShippingThreshold || 0)) return 0;
     return Number(config.shippingCost || 0);
-  }, [deliveryType, subtotal, config]);
+  }, [deliveryType, cartTotal, config]);
 
-  const total = subtotal + shipping;
+  const total = cartTotal + shipping;
 
   if (!user) {
     return (
@@ -225,6 +225,14 @@ export default function Checkout() {
           deliveryType,
           paymentMethod: selectedPayment,
           items: lines.map((line) => ({ productId: line.product.id, qty: line.qty })),
+          ...(activeBundle
+            ? {
+                bundleId: activeBundle.id,
+                bundleName: activeBundle.name,
+                bundleOfferPrice: activeBundle.offerPrice,
+                originalPrice: subtotal,
+              }
+            : {}),
         },
         idempotencyKey
       );
@@ -472,6 +480,13 @@ export default function Checkout() {
 
             <View style={{ gap: 8 }}>
               <SummaryRow label="Subtotal" value={money(subtotal)} />
+              {activeBundle && discount > 0 ? (
+                <SummaryRow
+                  label={`Oferta · ${activeBundle.name}`}
+                  value={`- ${money(discount)}`}
+                  accent={C.pink}
+                />
+              ) : null}
               <SummaryRow
                 label={deliveryType === 'pickup' ? 'Retiro en tienda' : 'Envío'}
                 value={shipping === 0 ? 'Gratis' : money(shipping)}

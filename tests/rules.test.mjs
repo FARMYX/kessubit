@@ -304,6 +304,46 @@ expectStatus(
 );
 ok('impide que el cliente cree colecciones');
 
+// --- offer bundles ---------------------------------------------------------
+await db.doc('offerBundles/rule-bundle-public').set({
+  name: 'Combo público',
+  productIds: ['pua-btr', 'guitarra-test'],
+  offerPrice: 100,
+  active: true,
+});
+expectStatus(await rest('offerBundles/rule-bundle-public'), 200, 'anonymous reads bundles');
+ok('permite leer ofertas sin iniciar sesión');
+
+expectStatus(
+  await rest('offerBundles?documentId=rule-bundle-client', {
+    method: 'POST',
+    idToken: client.idToken,
+    body: {
+      fields: {
+        name: s('Oferta falsa'),
+        productIds: arr([s('pua-btr'), s('guitarra-test')]),
+        offerPrice: n(1),
+        active: b(true),
+      },
+    },
+  }),
+  403,
+  'client creates a bundle'
+);
+ok('impide que el cliente cree ofertas');
+
+expectStatus(
+  await rest('offerBundles/rule-bundle-public', {
+    method: 'PATCH',
+    idToken: client.idToken,
+    masks: ['offerPrice'],
+    body: { fields: { offerPrice: n(1) } },
+  }),
+  403,
+  'client edits a bundle'
+);
+ok('impide que el cliente cambie ofertas');
+
 // --- fandoms ---------------------------------------------------------------
 expectStatus(await rest('fandoms/rule-fandom-public'), 200, 'anonymous reads fandoms');
 ok('permite leer etiquetas de fandom sin iniciar sesión');
@@ -836,6 +876,39 @@ expectStatus(
   'admin renames a collection'
 );
 ok('permite al administrador renombrar colecciones');
+
+expectStatus(
+  await rest('offerBundles?documentId=rule-bundle-1', {
+    method: 'POST',
+    idToken: adminUser.idToken,
+    body: {
+      fields: {
+        name: s('Combo de prueba'),
+        productIds: arr([s('pua-btr'), s('guitarra-test')]),
+        offerPrice: n(100),
+        originalPrice: n(115),
+        active: b(true),
+        createdAt: timestamp(),
+        updatedAt: timestamp(),
+      },
+    },
+  }),
+  200,
+  'admin creates a bundle'
+);
+ok('permite al administrador crear ofertas');
+
+expectStatus(
+  await rest('offerBundles/rule-bundle-1', {
+    method: 'PATCH',
+    idToken: adminUser.idToken,
+    masks: ['offerPrice'],
+    body: { fields: { offerPrice: n(90) } },
+  }),
+  200,
+  'admin edits a bundle'
+);
+ok('permite al administrador editar ofertas');
 
 expectStatus(
   await rest('fandoms?documentId=rule-fandom-1', {

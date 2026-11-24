@@ -27,7 +27,7 @@ import {
   updateFandom,
   useFandoms,
 } from '../../src/lib/fandoms';
-import { SEED_OFFERS, seedOfferPrices } from '../../src/lib/seed';
+
 import { Btn, Card, Field, Screen } from '../../src/components/UI';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { BackToStore } from '../../src/components/BackToStore';
@@ -69,7 +69,7 @@ export default function AdminSettings() {
   const [fandomColor, setFandomColor] = useState<string>(C.pink);
   const [editingFandom, setEditingFandom] = useState<string | null>(null);
   const [fandomBusy, setFandomBusy] = useState(false);
-  const [offersBusy, setOffersBusy] = useState(false);
+
 
   useEffect(() => {
     // Keep the local draft in sync when the remote config changes (another admin edited it).
@@ -285,37 +285,6 @@ export default function AdminSettings() {
     }, 'Borrar');
   };
 
-  const activateOffers = () => {
-    confirmAction(
-      'Activar ofertas de ejemplo',
-      `Se aplicarán ${SEED_OFFERS.length} bajadas de precio del catálogo demo. No se tocarán productos que ya tengan precio anterior.`,
-      async () => {
-        setOffersBusy(true);
-        try {
-          const count = await seedOfferPrices();
-          haptic.success();
-          if (count) {
-            playSound('offer');
-            toast.success(
-              'Ofertas activadas',
-              `${count} producto${count === 1 ? '' : 's'} muestran ahora su bajada en el catálogo.`
-            );
-          } else {
-            toast.info(
-              'Sin cambios',
-              'Los productos de ejemplo ya tenían precio anterior o cambiaron de precio.'
-            );
-          }
-        } catch {
-          haptic.error();
-          toast.error('No se pudieron activar', 'Revisa que tu usuario sea admin y las reglas estén publicadas.');
-        } finally {
-          setOffersBusy(false);
-        }
-      },
-      'Activar'
-    );
-  };
 
   const pickQr = async () => {
     setError('');
@@ -696,22 +665,6 @@ export default function AdminSettings() {
           </View>
         </Card>
 
-        <Card style={{ gap: space.sm }}>
-          <SectionTitle icon="pricetag-outline" title="Ofertas de ejemplo" />
-          <Text style={{ color: C.muted, fontSize: typeScale.small, lineHeight: 18 }}>
-            El catálogo demo trae {SEED_OFFERS.length} bajadas de precio. Actívalas para que el precio
-            tachado y el porcentaje se vean en las tarjetas. No se modifican ofertas que ya hayas
-            configurado a mano.
-          </Text>
-          <Btn
-            title="Activar ofertas de ejemplo"
-            icon="pricetag"
-            kind="soft"
-            compact
-            onPress={activateOffers}
-            loading={offersBusy}
-          />
-        </Card>
 
         <Card style={{ gap: space.sm }}>
           <SectionTitle icon="call-outline" title="Contacto" />

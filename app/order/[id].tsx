@@ -332,7 +332,21 @@ export default function OrderDetail() {
             <Divider />
 
             <View style={{ gap: 8 }}>
-              <SummaryRow label="Subtotal" value={money(order.subtotal ?? order.total)} />
+              <SummaryRow
+                label="Subtotal"
+                value={money(
+                  order.bundleName && Number(order.bundleOriginalPrice) > 0
+                    ? Number(order.bundleOriginalPrice)
+                    : order.subtotal ?? order.total
+                )}
+              />
+              {order.bundleName && Number(order.bundleOriginalPrice) > Number(order.bundleOfferPrice) ? (
+                <SummaryRow
+                  label={`Oferta · ${order.bundleName}`}
+                  value={`- ${money(Number(order.bundleOriginalPrice) - Number(order.bundleOfferPrice))}`}
+                  accent={C.pink}
+                />
+              ) : null}
               <SummaryRow
                 label={order.deliveryType === 'pickup' ? 'Retiro en tienda' : 'Envío'}
                 value={order.shipping ? money(order.shipping) : 'Gratis'}

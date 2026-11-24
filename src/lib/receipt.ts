@@ -172,7 +172,10 @@ export function receiptHtml(order: Order): string {
         <tbody>${rows}</tbody>
       </table>
       <div class="totals">
-        <div class="total-line"><span>Subtotal</span><span>${money(order.subtotal ?? order.items.reduce((sum, item) => sum + item.price * item.qty, 0))}</span></div>
+        <div class="total-line"><span>Subtotal</span><span>${money(order.bundleName && Number(order.bundleOriginalPrice) > 0 ? Number(order.bundleOriginalPrice) : (order.subtotal ?? order.items.reduce((sum, item) => sum + item.price * item.qty, 0)))}</span></div>
+        ${order.bundleName && Number(order.bundleOriginalPrice) > Number(order.bundleOfferPrice)
+          ? `<div class="total-line" style="color:${C.pink}"><span>Oferta · ${esc(order.bundleName)}</span><span>- ${money(Number(order.bundleOriginalPrice) - Number(order.bundleOfferPrice))}</span></div>`
+          : ''}
         <div class="total-line"><span>Envío</span><span>${money(order.shipping ?? 0)}</span></div>
         <div class="grand"><span>Total</span><span>${money(order.total)}</span></div>
       </div>

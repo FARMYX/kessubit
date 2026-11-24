@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { C, CATEGORIES } from '../../src/lib/theme';
+import { C, CATEGORIES, money } from '../../src/lib/theme';
 import { layout, radius, space, tracking, type as typeScale, weight } from '../../src/lib/design';
 import { useResponsive } from '../../src/lib/responsive';
 import { useProducts } from '../../src/context/ProductsContext';
@@ -16,10 +16,16 @@ import { playSound } from '../../src/lib/sound';
 import { haptic } from '../../src/lib/haptics';
 import { stockState } from '../../src/lib/stock';
 import { offerOf, productsOnOffer } from '../../src/lib/offers';
+import {
+  bundleOriginalPrice,
+  bundleProducts,
+  bundleSavings,
+  useOfferBundles,
+} from '../../src/lib/offerBundles';
 import { collectionOf, useCollections } from '../../src/lib/collections';
 import { usePendingProofOrder } from '../../src/lib/paymentReminder';
 import { PaymentReminder } from '../../src/components/PaymentReminder';
-import { Chip, Empty, ProductCard, Screen, useGrid } from '../../src/components/UI';
+import { Btn, Chip, Empty, ProductCard, Screen, useGrid } from '../../src/components/UI';
 import { FilterSheet, SORT_LABEL, type CatalogSort } from '../../src/components/FilterSheet';
 import { Skeleton } from '../../src/components/Skeleton';
 import { NotificationBell } from '../../src/components/NotificationBell';
@@ -51,11 +57,12 @@ export default function Catalog() {
   const { cols, itemW } = useGrid();
   const { isDesktop } = useResponsive();
   const { products, loading, error } = useProducts();
-  const { add, sync } = useCart();
+  const { add, applyBundle, sync } = useCart();
   const { user, profile, toggleFav } = useAuth();
   const { config } = useStoreConfig();
   const { forYou, personalized, scoreOf } = useRecommendations();
   const { collections } = useCollections();
+  const { bundles } = useOfferBundles();
   const pendingProof = usePendingProofOrder();
   const toast = useToast();
   const hasHeroImage = !!config.heroImage;
@@ -82,6 +89,10 @@ export default function Catalog() {
   );
 
   const offers = useMemo(() => productsOnOffer(products), [products]);
+  const activeBundles = useMemo(
+    () => bundles.filter((bundle) => bundle.active !== false && bundle.productIds.length >= 2),
+    [bundles]
+  );
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -132,6 +143,18 @@ export default function Catalog() {
       haptic.error();
       toast.error('Sin stock suficiente', `Solo quedan ${product.stock} de ${product.name}.`);
     }
+  };
+
+  const addCombo = (bundle: (typeof activeBundles)[number]) => {
+    const ok = applyBundle(bundle, products);
+    if (!ok) {
+      haptic.error();
+      toast.error('No se pudo agregar', 'Uno de los productos de la oferta no tiene stock.');
+      return;
+    }
+    playSound('offer');
+    haptic.success();
+    toast.success('Oferta agregada', bundle.name);
   };
 
   const toggleFavorite = async (product: Product) => {
@@ -437,6 +460,94 @@ export default function Catalog() {
               );
             })}
           </ScrollView>
+        </View>
+      ) : null}
+
+      {activeBundles.length ? (
+        <View style={{ marginBottom: space.xl }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, marginBottom: space.md }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                backgroundColor: C.pinkWash,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Ionicons name="gift-outline" size={17} color={C.pink} />
+            </View>
+            <View>
+              <Text style={{ color: C.ink, fontSize: typeScale.h3, fontWeight: weight.black, letterSpacing: -0.4 }}>
+                Ofertas de la tienda
+              </Text>
+              <Text style={{ color: C.muted, fontSize: typeScale.small }}>
+                Conjuntos elegidos por el local, a precio especial
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ gap: space.md }}>
+            {activeBundles.map((bundle) => {
+              const items = bundleProducts(bundle, products);
+              const regular = bundleOriginalPrice(bundle, products);
+              const saved = bundleSavings(bundle, products);
+              const unavailable = items.length !== bundle.productIds.length || items.some((p) => p.stock < 1);
+              if (!items.length) return null;
+              return (
+                <View
+                  key={bundle.id}
+                  style={{
+                    padding: space.md,
+                    borderRadius: radius.lg,
+                    backgroundColor: C.card,
+                    borderWidth: 1,
+                    borderColor: C.border,
+                    gap: space.sm,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: space.md }}>
+                    <View style={{ flex: 1, gap: 4 }}>
+                      <Text style={{ color: C.ink, fontWeight: weight.black, fontSize: typeScale.bodyLg }}>
+                        {bundle.name}
+                      </Text>
+                      <Text style={{ color: C.muted, fontSize: typeScale.small }} numberOfLines={2}>
+                        {items.map((p) => p.name).join(' · ')}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      {regular > bundle.offerPrice ? (
+                        <Text style={{ color: C.muted, fontSize: typeScale.caption, textDecorationLine: 'line-through' }}>
+                          {money(regular)}
+                        </Text>
+                      ) : null}
+                      <Text style={{ color: C.pink, fontWeight: weight.black, fontSize: typeScale.h3 }}>
+                        {money(bundle.offerPrice)}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' }}>
+                    {saved > 0 ? (
+                      <View style={{ backgroundColor: C.pinkWash, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 }}>
+                        <Text style={{ color: C.pink, fontWeight: weight.bold, fontSize: typeScale.caption }}>
+                          Ahorras {money(saved)}
+                        </Text>
+                      </View>
+                    ) : null}
+                    <Btn
+                      title={unavailable ? 'Sin stock' : 'Agregar oferta'}
+                      icon={unavailable ? 'alert-circle-outline' : 'bag-add-outline'}
+                      kind={unavailable ? 'ghost' : 'soft'}
+                      compact
+                      disabled={unavailable}
+                      onPress={() => addCombo(bundle)}
+                    />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
         </View>
       ) : null}
 

@@ -148,8 +148,22 @@ export function ReceiptSheet({ order, visible, onClose }: { order: Order; visibl
               <View style={{ alignSelf: 'flex-end', width: 220, gap: 3, marginTop: space.sm }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={{ color: C.muted, fontSize: typeScale.small }}>Subtotal</Text>
-                  <Text style={{ color: C.inkSoft, fontSize: typeScale.small }}>{money(subtotal)}</Text>
+                  <Text style={{ color: C.inkSoft, fontSize: typeScale.small }}>
+                    {money(
+                      order.bundleName && Number(order.bundleOriginalPrice) > 0
+                        ? Number(order.bundleOriginalPrice)
+                        : subtotal
+                    )}
+                  </Text>
                 </View>
+                {order.bundleName && Number(order.bundleOriginalPrice) > Number(order.bundleOfferPrice) ? (
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ color: C.pink, fontSize: typeScale.small }}>Oferta</Text>
+                    <Text style={{ color: C.pink, fontSize: typeScale.small }}>
+                      - {money(Number(order.bundleOriginalPrice) - Number(order.bundleOfferPrice))}
+                    </Text>
+                  </View>
+                ) : null}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={{ color: C.muted, fontSize: typeScale.small }}>Envío</Text>
                   <Text style={{ color: C.inkSoft, fontSize: typeScale.small }}>{money(order.shipping ?? 0)}</Text>

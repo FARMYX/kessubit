@@ -21,7 +21,7 @@ import { Skeleton } from '../../src/components/Skeleton';
 export default function Cart() {
   const router = useRouter();
   const { isDesktop } = useResponsive();
-  const { lines, count, subtotal, ready, setQty, remove, clear, sync } = useCart();
+  const { lines, count, subtotal, discount, total: cartTotal, activeBundle, ready, setQty, remove, clear, sync } = useCart();
   const { products, loading } = useProducts();
   const { config } = useStoreConfig();
   const toast = useToast();
@@ -32,14 +32,15 @@ export default function Cart() {
 
   const shipping = useMemo(() => {
     if (!config.deliveryEnabled) return 0;
-    if (subtotal >= Number(config.freeShippingThreshold || 0)) return 0;
+    if (cartTotal >= Number(config.freeShippingThreshold || 0)) return 0;
     return Number(config.shippingCost || 0);
-  }, [subtotal, config]);
+  }, [cartTotal, config]);
 
-  const missingForFree = Math.max(0, Number(config.freeShippingThreshold || 0) - subtotal);
+  const missingForFree = Math.max(0, Number(config.freeShippingThreshold || 0) - cartTotal);
   const progress = config.freeShippingThreshold
-    ? Math.min(1, subtotal / Number(config.freeShippingThreshold))
+    ? Math.min(1, cartTotal / Number(config.freeShippingThreshold))
     : 1;
+  const payable = cartTotal + shipping;
 
   const updateQty = (id: string, qty: number) => {
     setQty(id, qty);
@@ -196,6 +197,13 @@ export default function Cart() {
 
             <View style={{ gap: 8 }}>
               <Row label="Subtotal" value={money(subtotal)} />
+              {activeBundle && discount > 0 ? (
+                <Row
+                  label={`Oferta · ${activeBundle.name}`}
+                  value={`- ${money(discount)}`}
+                  accent={C.pink}
+                />
+              ) : null}
               <Row
                 label="Envío estimado"
                 value={shipping === 0 ? 'Gratis' : money(shipping)}
@@ -222,7 +230,7 @@ export default function Cart() {
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
               <Text style={{ color: C.ink, fontWeight: weight.bold, fontSize: typeScale.bodyLg }}>Total</Text>
               <Text style={{ color: C.ink, fontWeight: weight.black, fontSize: typeScale.h3 }}>
-                {money(subtotal + shipping)}
+                {money(payable)}
               </Text>
             </View>
 

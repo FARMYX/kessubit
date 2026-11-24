@@ -30,6 +30,7 @@ type StatusStep = Exclude<OrderStatus, 'cancelado'>;
 const DELIVERY_TYPES: CheckoutInput['deliveryType'][] = ['delivery', 'pickup'];
 const PAYMENT_METHODS: CheckoutInput['paymentMethod'][] = ['efectivo', 'qr', 'transferencia'];
 const IDEMPOTENCY_RE = /^[A-Za-z0-9_-]{8,64}$/;
+const DOC_ID_RE = /^[A-Za-z0-9_-]{1,128}$/;
 /** Firestore limita el documento a 1 MiB; dejamos margen para los metadatos. */
 const PROOF_MAX_CHARS = 900_000;
 
@@ -162,6 +163,11 @@ export async function createOrder(
   const counterRef = doc(db, 'counters', 'orders');
   const configRef = doc(db, 'storeConfig', 'settings');
   const productRefs = items.map((item) => doc(db, 'products', item.productId));
+  const bundleId =
+    typeof input.bundleId === 'string' && DOC_ID_RE.test(input.bundleId)
+      ? input.bundleId
+      : null;
+  const bundleRef = bundleId ? doc(db, 'offerBundles', bundleId) : null;
   const userNotificationRef = doc(collection(db, 'notifications'));
   const adminNotificationRef = doc(collection(db, 'notifications'));
 
@@ -183,9 +189,10 @@ export async function createOrder(
     }
 
     // --- reads (all reads happen before any write) ---
-    const [counterSnap, configSnap, ...productSnaps] = await Promise.all([
+    const [counterSnap, configSnap, bundleSnap, ...productSnaps] = await Promise.all([
       tx.get(counterRef),
       tx.get(configRef),
+      bundleRef ? tx.get(bundleRef) : Promise.resolve(null),
       ...productRefs.map((ref) => tx.get(ref)),
     ]);
 
@@ -199,6 +206,33 @@ export async function createOrder(
     }
     if (input.deliveryType === 'pickup' && config.pickupEnabled === false) {
       throw new Error('El retiro en tienda no está disponible ahora mismo.');
+    }
+
+    let bundle: { id: string; name: string; offerPrice: number; originalPrice: number } | null = null;
+    if (bundleRef && bundleSnap?.exists()) {
+      const data = bundleSnap.data() as Record<string, unknown>;
+      if (data.active === false) throw new Error('Esta oferta ya no está disponible.');
+      const ids = Array.isArray(data.productIds)
+        ? data.productIds.filter((id): id is string => typeof id === 'string')
+        : [];
+      const uniqueIds = Array.from(new Set(ids));
+      const offerPrice = Number(data.offerPrice);
+      if (uniqueIds.length < 2 || uniqueIds.length > 8 || !(offerPrice > 0)) {
+        throw new Error('Esta oferta ya no es válida.');
+      }
+      const cartIds = items.map((item) => item.productId);
+      const sameProducts =
+        cartIds.length === uniqueIds.length &&
+        items.every((item) => item.qty === 1 && uniqueIds.includes(item.productId));
+      if (!sameProducts) throw new Error('El carrito cambió y la oferta ya no aplica.');
+      bundle = {
+        id: bundleRef.id,
+        name: String(data.name || 'Oferta'),
+        offerPrice,
+        originalPrice: Number(input.originalPrice) > 0 ? Number(input.originalPrice) : offerPrice,
+      };
+    } else if (bundleRef) {
+      throw new Error('Esta oferta ya no está disponible.');
     }
 
     const orderItems: OrderItem[] = [];
@@ -240,6 +274,30 @@ export async function createOrder(
     }
 
     subtotal = round2(subtotal);
+
+    if (bundle) {
+      // The server recalculates the bundle from live prices so a stale client
+      // cannot invent a discount. The admin price must still beat the cart sum.
+      const regular = round2(
+        orderItems.reduce((sum, item) => sum + item.price * item.qty, 0)
+      );
+      if (!(bundle.offerPrice > 0) || bundle.offerPrice >= regular) {
+        throw new Error('El precio de la oferta ya no es válido. Vuelve a intentarlo.');
+      }
+      const factor = bundle.offerPrice / regular;
+      let applied = 0;
+      orderItems.forEach((item, index) => {
+        if (index === orderItems.length - 1) {
+          item.price = round2(bundle!.offerPrice - applied);
+        } else {
+          item.price = round2(item.price * factor);
+          applied += item.price;
+        }
+      });
+      bundle.originalPrice = regular;
+      subtotal = round2(orderItems.reduce((sum, item) => sum + item.price * item.qty, 0));
+    }
+
     const shipping = round2(shippingFor(subtotal, config, input.deliveryType));
     const total = round2(subtotal + shipping);
     const counterValue = Number(counterSnap.exists() ? counterSnap.data()?.value || 0 : 0);
@@ -276,6 +334,14 @@ export async function createOrder(
       deliveryType: input.deliveryType,
       paymentMethod: input.paymentMethod,
       paymentStatus,
+      ...(bundle
+        ? {
+            bundleId: bundle.id,
+            bundleName: bundle.name,
+            bundleOfferPrice: bundle.offerPrice,
+            bundleOriginalPrice: bundle.originalPrice,
+          }
+        : {}),
       status: 'pendiente',
       statusHistory: [
         { status: 'pendiente', at: now, by: current.uid, byName: customerName },

@@ -47,6 +47,26 @@ export type Product = {
   featured?: boolean;
 };
 
+export type OfferBundle = {
+  id: string;
+  name: string;
+  productIds: string[];
+  /** Precio total de la oferta. Debe ser menor a la suma de precios actuales. */
+  offerPrice: number;
+  active?: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+  /** Precios usados al guardar, para calcular el ahorro aunque cambien luego. */
+  originalPrice?: number;
+};
+
+export type OfferBundleInput = {
+  bundleId?: string;
+  bundleName?: string;
+  offerPrice?: number;
+  originalPrice?: number;
+};
+
 export type OrderStatus = 'pendiente' | 'preparando' | 'enviado' | 'entregado' | 'cancelado';
 
 export type OrderItem = {
@@ -111,6 +131,10 @@ export type Order = {
   verifiedByName?: string;
   verifiedAt?: any;
   paymentRejectedReason?: string;
+  bundleId?: string;
+  bundleName?: string;
+  bundleOfferPrice?: number;
+  bundleOriginalPrice?: number;
   status: OrderStatus;
   statusHistory?: OrderStatusEntry[];
   createdAt?: any;
@@ -200,7 +224,7 @@ export type StoreConfig = {
   bankDocument?: string;
 };
 
-export type CheckoutInput = {
+export type CheckoutInput = OfferBundleInput & {
   userId: string;
   userEmail: string;
   customerName: string;
