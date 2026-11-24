@@ -83,7 +83,8 @@
             "enableShrinkResourcesInReleaseBuilds": true,
             "gifEnabled": false,
             "webpEnabled": false,
-            "networkInspector": false
+            "networkInspector": false,
+            "extraProguardRules": "-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class * extends androidx.work.InputMerger { <init>(); }"
           }
         }
       ]
