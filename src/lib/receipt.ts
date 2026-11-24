@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import {
   C,
   DELIVERY_LABEL,
@@ -204,14 +205,41 @@ export function printReceipt(order: Order): boolean {
   return true;
 }
 
-/** Abre el recibo donde sea posible: pestaña nueva en web, navegador en nativo. */
+/** Abre el recibo: impresión/PDF en web, impresión nativa o compartir en móvil. */
 export async function openReceipt(order: Order): Promise<boolean> {
-  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  const html = receiptHtml(order);
+
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof document !== 'undefined') {
     return printReceipt(order);
   }
+
+  try {
+    const Print = await import('expo-print');
+    await Print.printAsync({ html });
+    return true;
+  } catch {
+    // Fallback below: some devices/sandboxes don't support the print dialog.
+  }
+
+  try {
+    const Print = await import('expo-print');
+    const Sharing = await import('expo-sharing');
+    const { uri } = await Print.printToFileAsync({ html });
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        UTI: 'com.adobe.pdf',
+        dialogTitle: `Recibo ${orderCode(order)}`,
+      });
+      return true;
+    }
+  } catch {
+    // ignore and try browser fallback
+  }
+
   try {
     const WebBrowser = await import('expo-web-browser');
-    const url = `data:text/html;charset=utf-8,${encodeURIComponent(receiptHtml(order))}`;
+    const url = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
     await WebBrowser.openBrowserAsync(url, { showTitle: true, toolbarColor: C.pink });
     return true;
   } catch {
